@@ -1,387 +1,2822 @@
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SME Credit Risk Detection</title>
+  <title>SME Credit Risk Intelligence & Underwriting Terminal</title>
+  
+  <!-- Typography: Plus Jakarta Sans for UI/Numbers + Hind Siliguri for Bengali -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
   <style>
     :root {
-      --ink: #14213D;
-      --ink-soft: #5C6B8A;
-      --line: #E3E7EF;
+      /* Light Theme (Swiss Institutional FinTech) */
+      --bg-base: #F8FAFC;
+      --bg-subtle: #F1F5F9;
       --surface: #FFFFFF;
-      --canvas: #F5F6FA;
-      --accent: #0E6B5C;
-      --accent-hover: #0A5147;
-      --low: #1E7B4D;
-      --low-bg: #EAF6EF;
-      --medium: #B4700A;
-      --medium-bg: #FCF3E3;
-      --high: #B0362B;
-      --high-bg: #FBEAE8;
+      --surface-elevated: #FFFFFF;
+      --surface-hover: #F8FAFC;
+      --border-subtle: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --border-focus: #2563EB;
+      
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --text-dim: #94A3B8;
+
+      --brand-primary: #1E40AF;
+      --brand-primary-hover: #1D4ED8;
+      --brand-accent: #0284C7;
+      --brand-accent-subtle: rgba(2, 132, 199, 0.08);
+
+      --safe: #059669;
+      --safe-bg: #ECFDF5;
+      --safe-border: #A7F3D0;
+      --safe-text: #065F46;
+
+      --caution: #D97706;
+      --caution-bg: #FFFBEB;
+      --caution-border: #FDE68A;
+      --caution-text: #92400E;
+
+      --danger: #DC2626;
+      --danger-bg: #FEF2F2;
+      --danger-border: #FECACA;
+      --danger-text: #991B1B;
+
+      --mono-font: 'JetBrains Mono', monospace;
+      --sans-font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --bn-font: 'Hind Siliguri', sans-serif;
+
+      --card-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+      --card-shadow-elevated: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --grid-pattern: rgba(148, 163, 184, 0.15);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+    }
+
+    [data-theme="dark"] {
+      /* Dark Theme (Institutional Obsidian Carbon) */
+      --bg-base: #0B0F19;
+      --bg-subtle: #070A10;
+      --surface: #111827;
+      --surface-elevated: #182234;
+      --surface-hover: #1E293B;
+      --border-subtle: #1F293D;
+      --border-strong: #334155;
+      --border-focus: #38BDF8;
+
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+
+      --brand-primary: #3B82F6;
+      --brand-primary-hover: #60A5FA;
+      --brand-accent: #38BDF8;
+      --brand-accent-subtle: rgba(56, 189, 248, 0.12);
+
+      --safe: #10B981;
+      --safe-bg: rgba(16, 185, 129, 0.12);
+      --safe-border: rgba(16, 185, 129, 0.25);
+      --safe-text: #34D399;
+
+      --caution: #F59E0B;
+      --caution-bg: rgba(245, 158, 11, 0.12);
+      --caution-border: rgba(245, 158, 11, 0.25);
+      --caution-text: #FBBF24;
+
+      --danger: #F43F5E;
+      --danger-bg: rgba(244, 63, 94, 0.12);
+      --danger-border: rgba(244, 63, 94, 0.25);
+      --danger-text: #FB7185;
+
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+      --card-shadow-elevated: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      --grid-pattern: rgba(255, 255, 255, 0.04);
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: 'Hind Siliguri', -apple-system, sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-      margin: 0;
-      padding: 48px 24px;
+      font-family: var(--bn-font);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
       line-height: 1.5;
-    }
-
-    .page {
-      max-width: 760px;
-      margin: 0 auto;
-    }
-
-    .masthead {
-      margin-bottom: 36px;
-      text-align: center;
-    }
-
-    .masthead .eyebrow {
-      font-size: 13px;
-      color: var(--accent);
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-align: center;
-    }
-
-    .masthead h1 {
-      font-size: 30px;
-      font-weight: 700;
-      margin: 0 0 10px;
-      letter-spacing: -0.01em;
-    }
-
-    .masthead p {
-      font-size: 15px;
-      color: var(--ink-soft);
-      margin: 0 auto;
-      max-width: 46ch;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 36px;
-    }
-
-    .error {
-      background: var(--high-bg);
-      border-left: 3px solid var(--high);
-      color: var(--high);
-      padding: 14px 18px;
-      border-radius: 8px;
       font-size: 14px;
-      margin-bottom: 24px;
+      position: relative;
+      background-image: 
+        linear-gradient(to right, var(--grid-pattern) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-pattern) 1px, transparent 1px);
+      background-size: 32px 32px;
+      background-position: center top;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .result {
-      border-radius: 12px;
-      padding: 24px 28px;
-      margin-bottom: 28px;
-      border-left: 4px solid;
+    .num, .amount, [data-num] {
+      font-family: var(--mono-font);
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
     }
 
-    .result.LOW {
-      background: var(--low-bg);
-      border-color: var(--low);
+    .terminal-shell {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 16px 20px 60px;
     }
 
-    .result.MEDIUM {
-      background: var(--medium-bg);
-      border-color: var(--medium);
+    /* TOP BAR */
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
     }
 
-    .result.HIGH {
-      background: var(--high-bg);
-      border-color: var(--high);
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .result-label {
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #1E40AF, #0284C7);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.28);
+    }
+
+    .brand-title-group h1 {
+      font-family: var(--sans-font);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .version-pill {
+      font-family: var(--mono-font);
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      letter-spacing: 0.02em;
+    }
+
+    .telemetry-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--safe);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--safe-bg);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-family: var(--sans-font);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .theme-toggle-btn .sun-icon { display: none; color: #F59E0B; }
+    .theme-toggle-btn .moon-icon { display: flex; color: #818CF8; }
+    [data-theme="dark"] .theme-toggle-btn .sun-icon { display: flex; }
+    [data-theme="dark"] .theme-toggle-btn .moon-icon { display: none; }
+
+    /* WORKSPACE SUB-NAV */
+    .workspace-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .view-segmented-control {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      gap: 2px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--sans-font);
       font-size: 13px;
       font-weight: 600;
-      color: var(--ink-soft);
-      margin: 0 0 2px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
-    .result-level {
-      font-size: 24px;
+    .seg-btn svg { opacity: 0.8; }
+
+    .seg-btn.active {
+      background: var(--surface-elevated);
+      color: var(--brand-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-subtle);
+    }
+    .seg-btn.active svg { opacity: 1; }
+    [data-theme="dark"] .seg-btn.active {
+      background: var(--surface-hover);
+      color: #38BDF8;
+      border-color: var(--border-strong);
+    }
+
+    .quick-preset-deck {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-label {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .preset-chip {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--sans-font);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preset-chip:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .preset-chip.prime:hover { border-color: var(--safe); color: var(--safe); }
+    .preset-chip.moderate:hover { border-color: var(--caution); color: var(--caution); }
+    .preset-chip.subprime:hover { border-color: var(--danger); color: var(--danger); }
+
+    .preset-icon-badge {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preset-icon-badge.safe { background: var(--safe-bg); color: var(--safe); }
+    .preset-icon-badge.caution { background: var(--caution-bg); color: var(--caution); }
+    .preset-icon-badge.danger { background: var(--danger-bg); color: var(--danger); }
+
+    /* WORKSPACE GRID: 2-COLUMN SPLIT */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* CARD CONTAINER */
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .panel-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .panel-card-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-subtle);
+    }
+
+    .panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title-wrap h2 {
+      font-size: 13.5px;
       font-weight: 700;
-      margin: 0 0 18px;
+      font-family: var(--sans-font);
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    .result.LOW .result-level {
-      color: var(--low);
+    .panel-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
     }
 
-    .result.MEDIUM .result-level {
-      color: var(--medium);
+    .panel-card-body {
+      padding: 22px;
     }
 
-    .result.HIGH .result-level {
-      color: var(--high);
+    /* FORM ARCHITECTURE */
+    .form-section {
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--sans-font);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+    [data-theme="dark"] .section-legend {
+      color: var(--brand-accent);
+    }
+
+    .section-legend-num {
+      width: 20px;
+      height: 20px;
+      background: var(--brand-accent-subtle);
+      color: inherit;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10.5px;
+      font-family: var(--mono-font);
+      font-weight: 700;
+    }
+
+    .fields-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .fields-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .fields-grid-3, .fields-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-control {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-control label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .input-control label .en-tag {
+      font-family: var(--sans-font);
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper .prefix {
+      position: absolute;
+      left: 10px;
+      font-family: var(--mono-font);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .input-wrapper input,
+    .input-control select {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: var(--sans-font);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .input-wrapper.has-prefix input {
+      padding-left: 26px;
+    }
+
+    .input-wrapper input:focus,
+    .input-control select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--brand-accent-subtle);
+      background: var(--surface);
+    }
+
+    .input-micro-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      min-height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Live Ratio Assessment Strip */
+    .ratio-strip {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      padding: 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .ratio-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .ratio-label {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ratio-val-tag {
+      font-family: var(--mono-font);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    /* Form Action Bar - Centered */
+    .form-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .btn-submit-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 11px 24px;
+      border-radius: var(--radius-md);
+      font-family: var(--sans-font);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+      transition: all 0.2s ease;
+    }
+    [data-theme="dark"] .btn-submit-primary {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-submit-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(30, 64, 175, 0.35);
+    }
+
+    .btn-submit-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .kbd-shortcut {
+      font-family: var(--mono-font);
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .btn-reset-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--sans-font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-reset-secondary:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    /* RIGHT COLUMN: INTELLIGENCE & CREDIT MEMORANDUM */
+    .memo-card {
+      position: sticky;
+      top: 20px;
+    }
+
+    .memo-idle-state {
+      text-align: center;
+      padding: 44px 24px;
+    }
+
+    .idle-icon-wrap {
+      width: 64px;
+      height: 64px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .memo-idle-state h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      font-family: var(--sans-font);
+    }
+
+    .memo-idle-state p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      max-width: 40ch;
+      margin: 0 auto 20px;
+    }
+
+    .idle-checklist {
+      text-align: left;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .idle-checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ACTIVE CREDIT MEMORANDUM */
+    .memo-active {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .memo-top-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid;
+    }
+
+    .memo-top-banner.LOW {
+      background: var(--safe-bg);
+      border-color: var(--safe-border);
+      color: var(--safe-text);
+    }
+    .memo-top-banner.MEDIUM {
+      background: var(--caution-bg);
+      border-color: var(--caution-border);
+      color: var(--caution-text);
+    }
+    .memo-top-banner.HIGH {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger-text);
+    }
+
+    .risk-grade-badge {
+      font-family: var(--sans-font);
+      font-size: 14.5px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .LOW .badge-indicator-dot { background: var(--safe); box-shadow: 0 0 0 3px var(--safe-border); }
+    .MEDIUM .badge-indicator-dot { background: var(--caution); box-shadow: 0 0 0 3px var(--caution-border); }
+    .HIGH .badge-indicator-dot { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-border); }
+
+    .memo-dossier-id {
+      font-family: var(--mono-font);
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    /* SVG SPEEDOMETER */
+    .gauge-hud-container {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 14px;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .gauge-hud-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .gauge-svg-wrap {
+      text-align: center;
+      position: relative;
+    }
+
+    .speedometer-svg {
+      width: 100%;
+      max-width: 150px;
+      overflow: visible;
+    }
+
+    .gauge-center-stat {
+      margin-top: -12px;
+      font-family: var(--mono-font);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .gauge-center-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .prob-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .prob-row {
       display: grid;
-      grid-template-columns: 64px 1fr 44px;
+      grid-template-columns: 65px 1fr 45px;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-      font-size: 13px;
+      gap: 8px;
+      font-size: 11.5px;
     }
 
-    .prob-row:last-child {
-      margin-bottom: 0;
+    .prob-tier-name {
+      font-family: var(--sans-font);
+      font-weight: 700;
     }
+    .prob-row.LOW .prob-tier-name { color: var(--safe); }
+    .prob-row.MEDIUM .prob-tier-name { color: var(--caution); }
+    .prob-row.HIGH .prob-tier-name { color: var(--danger); }
 
-    .prob-track {
-      background: rgba(0, 0, 0, 0.06);
-      border-radius: 5px;
+    .prob-bar-rail {
       height: 6px;
+      background: var(--border-subtle);
+      border-radius: 999px;
       overflow: hidden;
     }
 
-    .prob-fill {
+    .prob-bar-fill {
       height: 100%;
-      border-radius: 5px;
-      background: currentColor;
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    .prob-row.LOW .prob-bar-fill { background: var(--safe); }
+    .prob-row.MEDIUM .prob-bar-fill { background: var(--caution); }
+    .prob-row.HIGH .prob-bar-fill { background: var(--danger); }
 
-    .prob-row.LOW {
-      color: var(--low);
-    }
-
-    .prob-row.MEDIUM {
-      color: var(--medium);
-    }
-
-    .prob-row.HIGH {
-      color: var(--high);
-    }
-
-    .prob-pct {
-      text-align: right;
-      color: var(--ink-soft);
-    }
-
-    form {
-      margin: 0;
-    }
-
-    .section-title {
-      font-size: 12px;
+    .prob-percent {
+      font-family: var(--mono-font);
       font-weight: 600;
-      color: var(--ink-soft);
-      margin: 0 0 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--line);
+      text-align: right;
+      color: var(--text-primary);
     }
 
-    .section-title+.section-title {
-      margin-top: 8px;
+    /* RISK DRIVERS */
+    .drivers-block {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
     }
 
-    .grid {
+    .block-heading {
+      font-family: var(--sans-font);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drivers-tag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .driver-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+
+    .driver-tag-row.positive {
+      background: var(--safe-bg);
+      border-color: var(--safe-border);
+      color: var(--safe-text);
+    }
+    .driver-tag-row.warning {
+      background: var(--caution-bg);
+      border-color: var(--caution-border);
+      color: var(--caution-text);
+    }
+    .driver-tag-row.negative {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger-text);
+    }
+    .driver-tag-row.neutral {
+      background: var(--bg-subtle);
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .recommendation-card {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .rec-symbol {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+    }
+    .LOW .rec-symbol { color: var(--safe); }
+    .MEDIUM .rec-symbol { color: var(--caution); }
+    .HIGH .rec-symbol { color: var(--danger); }
+
+    .rec-body h4 {
+      font-family: var(--sans-font);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .rec-body p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .memo-actions-strip {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px 20px;
-      margin-bottom: 28px;
+      gap: 10px;
     }
 
-    .field label {
-      display: block;
-      font-size: 12.5px;
-      color: var(--ink-soft);
-      margin-bottom: 6px;
-      line-height: 1.35;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--ink);
+    .memo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
       background: var(--surface);
-      transition: border-color 0.15s ease;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    button {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 13px 24px;
-      border-radius: 8px;
-      font-size: 15px;
+      color: var(--text-primary);
+      font-family: var(--sans-font);
+      font-size: 12.5px;
       font-weight: 600;
-      font-family: inherit;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
     }
 
-    button:hover {
-      background: var(--accent-hover);
+    .memo-btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
     }
 
-    @media (max-width: 560px) {
-      .grid {
-        grid-template-columns: 1fr;
+    /* BATCH WORKBENCH & FILTER BAR */
+    .batch-workbench {
+      display: none;
+    }
+
+    .batch-drop-card {
+      border: 2px dashed var(--border-strong);
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    .batch-drop-card:hover, .batch-drop-card.dragover {
+      border-color: var(--brand-accent);
+      background: var(--brand-accent-subtle);
+    }
+
+    .drop-icon-large {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      color: var(--brand-accent);
+    }
+
+    .batch-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .batch-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
+    }
 
-      .card {
-        padding: 24px;
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .kpi-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      font-family: var(--sans-font);
+    }
+
+    .kpi-val {
+      font-family: var(--mono-font);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .batch-table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .table-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-family: var(--sans-font);
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--brand-primary);
+      color: #FFFFFF;
+      border-color: var(--brand-primary);
+    }
+    [data-theme="dark"] .filter-btn.active {
+      background: var(--brand-accent);
+      color: #090D16;
+      border-color: var(--brand-accent);
+    }
+
+    .table-search-input {
+      height: 32px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-family: var(--sans-font);
+      font-size: 12px;
+      width: 220px;
+    }
+    .table-search-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .fin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    .fin-table th {
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-family: var(--sans-font);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .fin-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .fin-table tr:hover td {
+      background: var(--surface-hover);
+    }
+
+    /* MODAL / DRAWER SYSTEM */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .drawer-dialog {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      max-width: 650px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--card-shadow-elevated);
+      animation: modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modal-pop {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-header h3 {
+      font-family: var(--sans-font);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .btn-close-modal:hover { color: var(--text-primary); background: var(--bg-subtle); }
+
+    .drawer-body {
+      padding: 20px;
+    }
+
+    .code-console {
+      background: #090D16;
+      border: 1px solid #1F293D;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      position: relative;
+      margin: 12px 0;
+    }
+
+    .code-console pre {
+      font-family: var(--mono-font);
+      font-size: 12px;
+      color: #38BDF8;
+      overflow-x: auto;
+      line-height: 1.45;
+    }
+
+    .copy-code-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-family: var(--sans-font);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .copy-code-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .history-card-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .history-card-info strong {
+      font-family: var(--mono-font);
+      font-size: 13px;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .history-card-info span {
+      color: var(--text-muted);
+    }
+
+    .history-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-alert-banner {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ========================================================= */
+    /* DEDICATED INSTITUTIONAL PRINT CREDIT MEMO STYLING        */
+    /* ========================================================= */
+    .print-only-memo {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        margin: 12mm 15mm 15mm;
+        size: A4 portrait;
       }
 
       body {
-        padding: 28px 16px;
+        background: #FFFFFF !important;
+        color: #0F172A !important;
+        font-family: 'Hind Siliguri', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+        font-size: 11pt !important;
+        line-height: 1.4 !important;
+        background-image: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .terminal-shell, .drawer-overlay {
+        display: none !important;
+      }
+
+      .print-only-memo {
+        display: block !important;
+        width: 100% !important;
+        color: #0F172A !important;
+      }
+
+      .p-memo-confidential {
+        font-family: 'Plus Jakarta Sans', monospace;
+        font-size: 8pt;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #64748B;
+        border-bottom: 1.5pt solid #0F172A;
+        padding-bottom: 4px;
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .p-memo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1pt solid #CBD5E1;
+      }
+
+      .p-memo-title h1 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 16pt;
+        font-weight: 800;
+        color: #0F172A;
+        margin: 0 0 3px;
+        letter-spacing: -0.02em;
+      }
+
+      .p-memo-title p {
+        font-size: 10.5pt;
+        color: #475569;
+        margin: 0;
+      }
+
+      .p-memo-ref-box {
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9pt;
+        line-height: 1.4;
+        color: #334155;
+      }
+
+      .p-memo-decision-banner {
+        border: 1.5pt solid #0F172A;
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #F8FAFC !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .p-decision-main {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13pt;
+        font-weight: 800;
+      }
+
+      .p-decision-grade {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11pt;
+        font-weight: 700;
+      }
+
+      .p-section-heading {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 10pt;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #0F172A;
+        border-bottom: 1pt solid #0F172A;
+        padding-bottom: 3px;
+        margin: 14px 0 8px;
+      }
+
+      .p-grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+        font-size: 9.5pt;
+      }
+
+      .p-grid-table td, .p-grid-table th {
+        padding: 5px 8px;
+        border: 0.75pt solid #CBD5E1;
+        vertical-align: middle;
+      }
+
+      .p-grid-table th {
+        background: #F1F5F9 !important;
+        font-weight: 700;
+        color: #1E293B;
+        text-align: left;
+        width: 25%;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .p-grid-table td {
+        color: #0F172A;
+        width: 25%;
+      }
+
+      .p-grid-table .p-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+      }
+
+      .p-drivers-list {
+        margin: 6px 0 12px 18px;
+        font-size: 9.5pt;
+        line-height: 1.5;
+      }
+
+      .p-drivers-list li {
+        margin-bottom: 3px;
+      }
+
+      .p-rec-box {
+        border: 1pt solid #94A3B8;
+        background: #F8FAFC !important;
+        padding: 10px 14px;
+        border-radius: 4px;
+        margin-bottom: 22px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .p-rec-box h4 {
+        font-size: 10.5pt;
+        font-weight: 700;
+        margin: 0 0 4px;
+      }
+
+      .p-rec-box p {
+        font-size: 9.5pt;
+        margin: 0;
+        color: #334155;
+      }
+
+      .p-signature-strip {
+        margin-top: 35px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        page-break-inside: avoid;
+      }
+
+      .p-sig-box {
+        border-top: 1pt solid #475569;
+        padding-top: 6px;
+        text-align: center;
+        font-size: 8.5pt;
+        color: #475569;
+      }
+
+      .p-sig-box strong {
+        display: block;
+        color: #0F172A;
+        font-size: 9.5pt;
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="page">
 
-    <div class="masthead">
-      <p class="eyebrow">ক্রেডিট রিস্ক অ্যাসেসমেন্ট সিস্টেম</p>
-      <h1>SME Credit Risk Detection</h1>
-      <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর নির্ধারণের জন্য একটি বিশ্লেষণধর্মী টুল।</p>
+  <!-- SCREEN APP TERMINAL -->
+  <div class="terminal-shell">
+
+    <!-- INSTITUTIONAL TOP BAR -->
+    <header class="top-header">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand-title-group">
+          <h1>
+            SME RISK DETECTION & INTELLIGENCE
+            <span class="version-pill">RF-PRO v1.2</span>
+          </h1>
+          <div class="brand-subtitle">Automated Underwriting & Credit Risk Platform — বাংলাদেশ ব্যাংক ক্রেডিট গাইডলাইন সংবলিত</div>
+        </div>
+      </div>
+
+      <!-- Telemetry Chip -->
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <span class="status-dot"></span>
+          <span>Engine Active — সক্রিয় ইঞ্জিন</span>
+        </div>
+        <div class="telemetry-item">
+          <span>Latency — লেটেন্সি: <strong class="num">&lt;10ms</strong></span>
+        </div>
+        <div class="telemetry-item">
+          <span>Accuracy — নির্ভুলতা: <strong class="num">86.2%</strong></span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="header-controls">
+        <button class="header-btn" id="btn-api-docs" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          API Docs — এপিআই ডক
+        </button>
+        <button class="header-btn" id="btn-history" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Audit Archive — অডিট হিস্ট্রি
+        </button>
+        <button class="header-btn theme-toggle-btn" id="theme-toggle" type="button" aria-label="Theme Toggle — থিম পরিবর্তন">
+          <span class="sun-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </span>
+          <span class="moon-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </span>
+          <span id="theme-label">Theme — থিম</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- WORKSPACE SUB-NAV -->
+    <div class="workspace-nav">
+      <!-- Segmented View Tabs -->
+      <div class="view-segmented-control">
+        <button class="seg-btn active" id="tab-single" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          Single Appraisal — একক আন্ডাররাইটিং
+        </button>
+        <button class="seg-btn" id="tab-batch" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          Batch CSV Audit — পোর্টফোলিও ব্যাচ নিরীক্ষা
+        </button>
+      </div>
+
+      <!-- Quick Archetype Selector -->
+      <div class="quick-preset-deck" id="preset-container">
+        <span class="preset-label">Quick Presets — টেস্ট প্রোফাইল:</span>
+        <button type="button" class="preset-chip prime" onclick="loadPreset('low')">
+          <span class="preset-icon-badge safe">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </span>
+          Prime Exporter — টেক্সটাইল রপ্তানিকারক (Low Risk)
+        </button>
+        <button type="button" class="preset-chip moderate" onclick="loadPreset('medium')">
+          <span class="preset-icon-badge caution">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </span>
+          Agri Processing — কৃষি প্রক্রিয়াজাত (Moderate)
+        </button>
+        <button type="button" class="preset-chip subprime" onclick="loadPreset('high')">
+          <span class="preset-icon-badge danger">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+          </span>
+          Retail Startup — নতুন রিটেল শপ (High Risk)
+        </button>
+        <button type="button" class="preset-chip" onclick="resetForm()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+          Reset — রিসেট
+        </button>
+      </div>
     </div>
 
-    <div class="card">
+    {% if error %}
+    <div class="error-alert-banner">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <div><strong>Input Error — ইনপুট ত্রুটি:</strong> {{ error }}</div>
+    </div>
+    {% endif %}
 
-      {% if error %}
-      <div class="error">{{ error }}</div>
-      {% endif %}
+    <!-- VIEW 1: SINGLE UNDERWRITING ASSESSMENT -->
+    <div id="view-single">
+      <div class="workspace-grid">
 
-      {% if result %}
-      <div class="result {{ result.risk_level }}">
-        <p class="result-label">পূর্বাভাসকৃত ঝুঁকি স্তর</p>
-        <p class="result-level">{{ result.risk_level }}</p>
-        {% for level, prob in result.probabilities.items() %}
-        <div class="prob-row {{ level }}">
-          <span>{{ level }}</span>
-          <div class="prob-track">
-            <div class="prob-fill" style="width: {{ (prob*100)|round(1) }}%;"></div>
+        <!-- LEFT PANEL: UNDERWRITING INPUT CONSOLE -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <div class="panel-title-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <h2>Underwriting Input Console — আন্ডাররাইটিং ইনপুট কনসোল</h2>
+            </div>
+            <span class="panel-badge">12 Parameters — ১২টি প্যারামিটার</span>
           </div>
-          <span class="prob-pct">{{ (prob*100)|round(1) }}%</span>
+
+          <div class="panel-card-body">
+            <form method="POST" action="/predict" id="risk-form">
+
+              <!-- SECTION 1: BUSINESS PROFILE -->
+              <div class="form-section">
+                <div class="section-legend">
+                  <span class="section-legend-num">01</span>
+                  <span>Enterprise Profile & Tenure — ব্যবসায়িক প্রোফাইল ও পরিচিতি</span>
+                </div>
+                <div class="fields-grid-2">
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Business Age</span>
+                      <span>ব্যবসায়ের বয়স (বছর)</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="1" min="0" name="business_age_years" id="inp_business_age" required value="{{ form_data.business_age_years if form_data else '' }}" placeholder="e.g. 8">
+                    </div>
+                    <div class="input-micro-hint">Enterprise Tenure (Years) — প্রতিষ্ঠার সময়কাল</div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Owner Experience</span>
+                      <span>মালিকের অভিজ্ঞতা (বছর)</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="1" min="0" name="owner_experience_years" id="inp_owner_exp" required value="{{ form_data.owner_experience_years if form_data else '' }}" placeholder="e.g. 10">
+                    </div>
+                    <div class="input-micro-hint">Trade Experience (Years) — সংশ্লিষ্ট ট্রেড অভিজ্ঞতা</div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Banking Relationship</span>
+                      <span>ব্যাংকিং সম্পর্ক (বছর)</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="1" min="0" name="banking_years" id="inp_banking_years" required value="{{ form_data.banking_years if form_data else '' }}" placeholder="e.g. 5">
+                    </div>
+                    <div class="input-micro-hint">Account Age (Years) — অ্যাকাউন্টের বয়সকাল</div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Employee Headcount</span>
+                      <span>মোট কর্মচারী সংখ্যা</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="1" min="0" name="num_employees" id="inp_employees" required value="{{ form_data.num_employees if form_data else '' }}" placeholder="e.g. 15">
+                    </div>
+                    <div class="input-micro-hint">Total Workforce — মোট পূর্ণকালীন কর্মী</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 2: FINANCIAL LEVERAGE & COLLATERAL -->
+              <div class="form-section">
+                <div class="section-legend">
+                  <span class="section-legend-num">02</span>
+                  <span>Financial Capacity & Leverage — আর্থিক সক্ষমতা ও লিভারেজ</span>
+                </div>
+                <div class="fields-grid-2">
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Annual Revenue</span>
+                      <span>বার্ষিক টার্নওভার / আয়</span>
+                    </label>
+                    <div class="input-wrapper has-prefix">
+                      <span class="prefix">৳</span>
+                      <input type="number" step="any" min="0" name="annual_revenue" id="inp_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}" placeholder="e.g. 6500000">
+                    </div>
+                    <div class="input-micro-hint">
+                      <span id="hint_revenue">Enter Turnover (BDT) — টাকার পরিমাণ লিখুন</span>
+                    </div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Requested Loan Amount</span>
+                      <span>আবেদিত ঋণের পরিমাণ</span>
+                    </label>
+                    <div class="input-wrapper has-prefix">
+                      <span class="prefix">৳</span>
+                      <input type="number" step="any" min="0" name="loan_amount" id="inp_loan" required value="{{ form_data.loan_amount if form_data else '' }}" placeholder="e.g. 2000000">
+                    </div>
+                    <div class="input-micro-hint">
+                      <span id="hint_loan">Requested Facility (BDT) — ঋণের পরিমাণ</span>
+                    </div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Debt-to-Asset Ratio</span>
+                      <span>ঋণ-সম্পদ অনুপাত</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="any" min="0" max="2" name="debt_to_asset_ratio" id="inp_debt_asset" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}" placeholder="e.g. 0.35">
+                    </div>
+                    <div class="input-micro-hint">Benchmark: &lt; 0.50 — আদর্শ মান: &lt; ০.৫০ (e.g. 0.35)</div>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Collateral Value</span>
+                      <span>জামানতের মূল্য</span>
+                    </label>
+                    <div class="input-wrapper has-prefix">
+                      <span class="prefix">৳</span>
+                      <input type="number" step="any" min="0" name="collateral_value" id="inp_collateral" required value="{{ form_data.collateral_value if form_data else '' }}" placeholder="e.g. 3000000">
+                    </div>
+                    <div class="input-micro-hint">
+                      <span id="hint_collateral">Immovable Collateral (0 if None) — স্থাবর জামানত (না থাকলে ০)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fields-grid-2" style="margin-top: 14px;">
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Past Defaults</span>
+                      <span>অতীত খেলাপি রেকর্ড</span>
+                    </label>
+                    <div class="input-wrapper">
+                      <input type="number" step="1" min="0" name="past_defaults" id="inp_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
+                    </div>
+                    <div class="input-micro-hint">CIB Track Record — CIB খেলাপির সংখ্যা</div>
+                  </div>
+                </div>
+
+                <!-- Live Dynamic Micro-Indicators -->
+                <div class="ratio-strip">
+                  <div class="ratio-metric">
+                    <span class="ratio-label">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                      <strong>Collateral Coverage (LTV) — জামানত কভারেজ:</strong>
+                    </span>
+                    <span class="ratio-val-tag" id="live-collateral-cov">0.0%</span>
+                  </div>
+                  <div class="ratio-metric">
+                    <span class="ratio-label">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line><line x1="12" y1="20" x2="12" y2="9"></line></svg>
+                      <strong>Loan-to-Revenue — লোন-টু-টার্নওভার:</strong>
+                    </span>
+                    <span class="ratio-val-tag" id="live-loan-rev">0.0%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 3: SECTOR & LOCATION -->
+              <div class="form-section">
+                <div class="section-legend">
+                  <span class="section-legend-num">03</span>
+                  <span>Sector & Demographics — ভৌগোলিক অবস্থান ও শিল্প খাত</span>
+                </div>
+                <div class="fields-grid-3">
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">District</span>
+                      <span>জেলা</span>
+                    </label>
+                    <select name="district" id="inp_district" required>
+                      {% for d in districts %}
+                      <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Location Type</span>
+                      <span>অবস্থানের ধরন</span>
+                    </label>
+                    <select name="location_type" id="inp_location" required>
+                      {% for lt in location_types %}
+                      <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="input-control">
+                    <label>
+                      <span class="en-tag">Business Sector</span>
+                      <span>ব্যবসার খাত</span>
+                    </label>
+                    <select name="sector" id="inp_sector" required>
+                      {% for s in sectors %}
+                      <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FORM ACTION DECK (Centered) -->
+              <div class="form-action-bar">
+                <button type="button" class="btn-reset-secondary" onclick="resetForm()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+                  Reset — রিসেট
+                </button>
+                <button type="submit" class="btn-submit-primary" id="submit-btn">
+                  <span id="btn-text">Run Risk Appraisal & Generate Memo — ঝুঁকি বিশ্লেষণ ও ক্রেডিট মেমো তৈরি করুন</span>
+                  <span class="kbd-shortcut">Ctrl + ↵</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        {% endfor %}
+
+        <!-- RIGHT PANEL: CREDIT INTELLIGENCE MEMO -->
+        <div class="panel-card memo-card" id="memo-board">
+          <div class="panel-card-header">
+            <div class="panel-title-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <h2>Credit Intelligence Memorandum — ক্রেডিট ইন্টেলিজেন্স মেমোরেন্ডাম</h2>
+            </div>
+            <span class="panel-badge num">OFFICIAL MEMO</span>
+          </div>
+
+          <div class="panel-card-body">
+            {% if result %}
+            <!-- ACTIVE EVALUATION REPORT -->
+            <div class="memo-active" id="prediction-result-box">
+              
+              <!-- Decision Status Banner -->
+              <div class="memo-top-banner {{ result.risk_level }}">
+                <div>
+                  <div class="risk-grade-badge">
+                    <span class="badge-indicator-dot"></span>
+                    {% if result.risk_level == 'LOW' %}
+                    <span>LOW RISK (Prime) — ঋণ অনুমোদনযোগ্য (Prime Status)</span>
+                    {% elif result.risk_level == 'MEDIUM' %}
+                    <span>MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)</span>
+                    {% else %}
+                    <span>HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)</span>
+                    {% endif %}
+                  </div>
+                  <div style="font-size:12px; margin-top:2px; opacity:0.9;">
+                    Credit Risk Rating — ক্রেডিট রেটিং: <strong>{{ 'GRADE A (Prime)' if result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result.risk_level == 'MEDIUM' else 'GRADE C (Subprime)') }}</strong>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="memo-dossier-id">DOSSIER #{{ range(1000, 9999)|random }}</div>
+                  <div class="num" style="font-size:11px; opacity:0.8;">{{ result.insights.risk_score if result.insights else '0' }}/100</div>
+                </div>
+              </div>
+
+              <!-- SPEEDOMETER HUD + MULTI-CLASS CONFIDENCE MATRIX -->
+              <div class="gauge-hud-container">
+                <div class="gauge-svg-wrap">
+                  <svg class="speedometer-svg" viewBox="0 0 160 90">
+                    <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="var(--border-strong)" stroke-width="10" stroke-linecap="round" />
+                    <path d="M 20 80 A 60 60 0 0 1 60 28" fill="none" stroke="var(--safe)" stroke-width="10" stroke-linecap="round" />
+                    <path d="M 60 28 A 60 60 0 0 1 100 28" fill="none" stroke="var(--caution)" stroke-width="10" />
+                    <path d="M 100 28 A 60 60 0 0 1 140 80" fill="none" stroke="var(--danger)" stroke-width="10" stroke-linecap="round" />
+                    
+                    {% set score = result.insights.risk_score if result.insights else 50 %}
+                    {% set angle = (score / 100 * 180) - 90 %}
+                    <g transform="translate(80, 80) rotate({{ angle }})">
+                      <line x1="0" y1="0" x2="0" y2="-50" stroke="var(--text-primary)" stroke-width="3.5" stroke-linecap="round" />
+                      <circle cx="0" cy="0" r="5" fill="var(--text-primary)" />
+                    </g>
+                  </svg>
+                  <div class="gauge-center-stat">{{ score }}%</div>
+                  <div class="gauge-center-label">Risk Score — রিস্ক স্কোর</div>
+                </div>
+
+                <!-- Multi-class Probability Breakdown -->
+                <div class="prob-matrix">
+                  {% for level, prob in result.probabilities.items() %}
+                  <div class="prob-row {{ level }}">
+                    <span class="prob-tier-name">{{ level }} RISK</span>
+                    <div class="prob-bar-rail">
+                      <div class="prob-bar-fill" style="width: {{ (prob*100)|round(1) }}%;"></div>
+                    </div>
+                    <span class="prob-percent">{{ (prob*100)|round(1) }}%</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- RISK DRIVERS -->
+              {% if result.insights and result.insights.drivers %}
+              <div class="drivers-block">
+                <div class="block-heading">
+                  <span>Key Risk Drivers — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</span>
+                  <span>{{ result.insights.drivers|length }} Drivers Detected — শনাক্তকৃত ফ্যাক্টর</span>
+                </div>
+                <div class="drivers-tag-list">
+                  {% for driver in result.insights.drivers %}
+                  <div class="driver-tag-row {{ driver.type }}">
+                    {% if driver.type == 'positive' %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    {% elif driver.type == 'warning' %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+                    {% elif driver.type == 'negative' %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    {% else %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    {% endif %}
+                    <span>{{ driver.text }}</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- RECOMMENDATION BOX -->
+              {% if result.insights and result.insights.recommendation %}
+              <div class="recommendation-card">
+                <div class="rec-symbol">
+                  {% if result.risk_level == 'LOW' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  {% elif result.risk_level == 'MEDIUM' %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                  {% else %}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                  {% endif %}
+                </div>
+                <div class="rec-body">
+                  <h4>Underwriting Recommendation — {{ result.insights.recommendation.title }}</h4>
+                  <p>{{ result.insights.recommendation.summary }}</p>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- ACTIONS -->
+              <div class="memo-actions-strip">
+                <button type="button" class="memo-btn" onclick="executePrint()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  Print Credit Memo — প্রিন্ট মেমো
+                </button>
+                <button type="button" class="memo-btn" onclick="saveToHistory()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  Save to Archive — সংরক্ষণ
+                </button>
+              </div>
+
+            </div>
+            {% else %}
+            <!-- IDLE STATE -->
+            <div class="memo-idle-state">
+              <div class="idle-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              </div>
+              <h3>Assessment Pending — মূল্যায়ন মুলতুবি রয়েছে</h3>
+              <p>Fill in the underwriting inputs on the left console and click "Run Risk Appraisal" to generate the ML decision memorandum. — বাম পাশের কনসোলে তথ্য প্রদান করে "ঝুঁকি বিশ্লেষণ" বাটনে ক্লিক করুন।</p>
+              
+              <div class="idle-checklist">
+                <div class="idle-checklist-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Automated Collateral Coverage (LTV) — স্বয়ংক্ৰিয় জামানত কভারেজ হিসাব</span>
+                </div>
+                <div class="idle-checklist-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Loan-to-Turnover Exposure Matrix — লোন-টু-টার্নওভার রিস্ক এক্সপোজার</span>
+                </div>
+                <div class="idle-checklist-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Explainable Feature Risk Drivers (XAI) — রিস্ক ড্রাইভার ডিকম্পোজিশন</span>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
       </div>
+    </div>
+
+    <!-- VIEW 2: PORTFOLIO BATCH CSV PROCESSING -->
+    <div id="view-batch" class="batch-workbench">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div class="panel-title-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <h2>Portfolio Batch Underwriting Engine — পোর্টফোলিও ব্যাচ প্রসেসিং হাব</h2>
+          </div>
+          <a href="/sample_template_csv" class="header-btn" style="text-decoration:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Sample CSV Template — নমুনা CSV ডাউনলোড
+          </a>
+        </div>
+
+        <div class="panel-card-body">
+          <div class="batch-drop-card" id="csv-dropzone" onclick="document.getElementById('csv-file-input').click()">
+            <div class="drop-icon-large">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            </div>
+            <h3 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+              Upload / Drop CSV File — CSV ফাইল ড্রপ করুন অথবা ব্রাউজ করুন
+            </h3>
+            <p style="font-size:12px; color:var(--text-muted); margin:0;">
+              Upload SME portfolio data (.csv) to generate instant vectorized ML credit appraisal reports. — দ্রুত ফলাফল পেতে এসএমই পোর্টফোলিও ডেটা (.csv) আপলোড করুন।
+            </p>
+            <input type="file" id="csv-file-input" accept=".csv" style="display:none;" onchange="handleFileSelect(event)">
+          </div>
+
+          <div id="batch-status" style="display:none; text-align:center; padding:24px;">
+            <div style="font-size:13px; font-weight:600; color:var(--brand-accent);" id="batch-status-text">
+              Vectorized Inference in Progress — ফাইল প্রক্রিয়াকরণ চলছে...
+            </div>
+          </div>
+
+          <div id="batch-results-wrapper" style="display:none;">
+            <div class="batch-kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-title">Total Applications — মোট আবেদন</div>
+                <div class="kpi-val" id="kpi-total">0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Low Risk (Prime) — লো রিস্ক</div>
+                <div class="kpi-val" style="color:var(--safe);" id="kpi-low">0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">Medium Risk (Watch) — মিডিয়াম রিস্ক</div>
+                <div class="kpi-val" style="color:var(--caution);" id="kpi-med">0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-title">High Risk (Critical) — হাই রিস্ক</div>
+                <div class="kpi-val" style="color:var(--danger);" id="kpi-high">0</div>
+              </div>
+            </div>
+
+            <!-- Table Filter & Search Toolbar -->
+            <div class="batch-table-toolbar">
+              <div class="table-filter-group">
+                <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Filter — ফিল্টার:</span>
+                <button type="button" class="filter-btn active" onclick="filterBatchTable('ALL')">All Records — সবগুলো (<span id="count-all">0</span>)</button>
+                <button type="button" class="filter-btn" onclick="filterBatchTable('LOW')">Low Risk — লো রিস্ক</button>
+                <button type="button" class="filter-btn" onclick="filterBatchTable('MEDIUM')">Medium Risk — মিডিয়াম রিস্ক</button>
+                <button type="button" class="filter-btn" onclick="filterBatchTable('HIGH')">High Risk — হাই রিস্ক</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="text" class="table-search-input" id="batch-search-box" placeholder="Search District / Sector — খুঁজুন..." oninput="searchBatchTable()">
+                <button type="button" class="memo-btn" onclick="exportBatchResultsCSV()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Export CSV — এক্সপোর্ট
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="fin-table" id="batch-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>District — জেলা</th>
+                    <th>Sector — শিল্প খাত</th>
+                    <th>Loan Amount — ঋণের পরিমাণ</th>
+                    <th>Turnover — বার্ষিক টার্নওভার</th>
+                    <th>Risk Level — ঝুঁকি স্তর</th>
+                    <th>Risk Score — স্কোর</th>
+                  </tr>
+                </thead>
+                <tbody id="batch-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DEDICATED PRINTABLE CREDIT EVALUATION MEMO (Visible Only on Print) -->
+  <div id="printable-credit-memo" class="print-only-memo">
+    <div class="p-memo-confidential">
+      <span>CONFIDENTIAL & PROPRIETARY</span>
+      <span>BANGLADESH BANK SME CREDIT FRAMEWORK v2.4</span>
+      <span>INTERNAL CREDIT COMMITTEE USE ONLY</span>
+    </div>
+
+    <div class="p-memo-header">
+      <div class="p-memo-title">
+        <h1>SME CREDIT RISK APPRAISAL MEMORANDUM</h1>
+        <p>SME Credit Assessment & Underwriting Recommendations — ক্ষুদ্র ও মাঝারি উদ্যোক্তা ঋণ ঝুঁকি মূল্যায়ন ও সুপারিশনামা</p>
+      </div>
+      <div class="p-memo-ref-box">
+        <div><strong>MEMO REF:</strong> SME-CRD-<span id="p-memo-id">{{ range(1000, 9999)|random }}</span></div>
+        <div><strong>DATE:</strong> <span id="p-memo-date"></span></div>
+        <div><strong>MODEL:</strong> Random Forest v1.2</div>
+      </div>
+    </div>
+
+    <!-- Official Decision Banner -->
+    <div class="p-memo-decision-banner">
+      <div>
+        <div class="p-decision-main" id="p-decision-text">
+          {% if result %}
+            {% if result.risk_level == 'LOW' %}
+              [APPROVED] LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Standard Prime Terms)
+            {% elif result.risk_level == 'MEDIUM' %}
+              [CONDITIONAL] MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা ও বর্ধিত জামানত
+            {% else %}
+              [REJECT / HIGH RISK] SUBPRIME — সাবপ্রাইম ঝুঁকি ও উচ্চ খেলাপি সম্ভাবনা
+            {% endif %}
+          {% else %}
+            [PROVISIONAL] Underwriting Review Pending — আন্ডাররাইটিং রিভিউ প্রক্রিয়াধীন
+          {% endif %}
+        </div>
+        <div style="font-size:9pt; color:#475569; margin-top:2px;">
+          Credit Risk Rating — ক্রেডিট রেটিং: <strong id="p-decision-tier">
+            {% if result %}
+              {{ 'GRADE A (Prime)' if result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result.risk_level == 'MEDIUM' else 'GRADE C (Subprime)') }}
+            {% else %}
+              PENDING
+            {% endif %}
+          </strong>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:8.5pt; color:#64748B;">Overall Risk Score — সামগ্রিক স্কোর</div>
+        <div class="p-decision-grade" id="p-decision-score">
+          {{ result.insights.risk_score if result and result.insights else '0' }}%
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Enterprise Profile -->
+    <div class="p-section-heading">1. Enterprise Profile — গ্রাহক ও প্রতিষ্ঠানের তথ্য</div>
+    <table class="p-grid-table">
+      <tr>
+        <th>Business Age — ব্যবসায়ের বয়স</th>
+        <td class="p-num" id="p-biz-age">{{ form_data.business_age_years if form_data else '-' }} Years</td>
+        <th>Owner Experience — ট্রেড অভিজ্ঞতা</th>
+        <td class="p-num" id="p-owner-exp">{{ form_data.owner_experience_years if form_data else '-' }} Years</td>
+      </tr>
+      <tr>
+        <th>Banking Relationship — ব্যাংকিং সম্পর্ক</th>
+        <td class="p-num" id="p-banking-age">{{ form_data.banking_years if form_data else '-' }} Years</td>
+        <th>Employee Headcount — মোট কর্মী</th>
+        <td class="p-num" id="p-employees">{{ form_data.num_employees if form_data else '-' }}</td>
+      </tr>
+      <tr>
+        <th>District & Location — জেলা ও অবস্থান</th>
+        <td id="p-location">{{ form_data.district if form_data else '-' }} ({{ form_data.location_type if form_data else '-' }})</td>
+        <th>Business Sector — শিল্প খাত</th>
+        <td id="p-sector">{{ form_data.sector if form_data else '-' }}</td>
+      </tr>
+    </table>
+
+    <!-- Section 2: Financial Metrics & Ratios -->
+    <div class="p-section-heading">2. Financial Exposure & Ratios — আর্থিক সক্ষমতা ও রিস্ক রেশিও</div>
+    <table class="p-grid-table">
+      <tr>
+        <th>Requested Loan — আবেদিত ঋণ</th>
+        <td class="p-num" id="p-loan-amount">৳ {{ form_data.loan_amount if form_data else '-' }}</td>
+        <th>Annual Turnover — বার্ষিক টার্নওভার</th>
+        <td class="p-num" id="p-revenue">৳ {{ form_data.annual_revenue if form_data else '-' }}</td>
+      </tr>
+      <tr>
+        <th>Collateral Value — জামানত</th>
+        <td class="p-num" id="p-collateral">৳ {{ form_data.collateral_value if form_data else '-' }}</td>
+        <th>Collateral Coverage (LTV) — জামানত কভারেজ</th>
+        <td class="p-num" id="p-col-cov">
+          {{ result.insights.collateral_coverage if result and result.insights else '-' }}%
+        </td>
+      </tr>
+      <tr>
+        <th>Debt-to-Asset (D/A) — ঋণ-সম্পদ অনুপাত</th>
+        <td class="p-num" id="p-debt-asset">{{ form_data.debt_to_asset_ratio if form_data else '-' }}</td>
+        <th>Loan-to-Turnover — লোন/টার্নওভার অনুপাত</th>
+        <td class="p-num" id="p-loan-rev">
+          {{ result.insights.loan_to_revenue if result and result.insights else '-' }}%
+        </td>
+      </tr>
+      <tr>
+        <th>Past Defaults — অতীত খেলাপি রেকর্ড</th>
+        <td class="p-num" id="p-defaults">{{ form_data.past_defaults if form_data else '0' }} Times</td>
+        <th>CIB Track Record — সিআইবি স্ট্যাটাস</th>
+        <td id="p-cib-status">
+          {{ 'Clean Record — অতীত খেলাপি মুক্ত' if not form_data or form_data.past_defaults == '0' or form_data.past_defaults == 0 else 'Default Record Exists — খেলাপি ইতিহাস বিদ্যমান' }}
+        </td>
+      </tr>
+    </table>
+
+    <!-- Section 3: Model Probability Matrix -->
+    <div class="p-section-heading">3. Statistical Probability Matrix — মডেল রিস্ক স্কোরকার্ড</div>
+    <table class="p-grid-table">
+      <tr>
+        <th>Low Risk Probability — লো রিস্ক সম্ভাবনা</th>
+        <td class="p-num" id="p-prob-low">
+          {{ (result.probabilities.LOW * 100)|round(1) if result else '-' }}%
+        </td>
+        <th>Medium Risk Probability — মিডিয়াম সম্ভাবনা</th>
+        <td class="p-num" id="p-prob-med">
+          {{ (result.probabilities.MEDIUM * 100)|round(1) if result else '-' }}%
+        </td>
+      </tr>
+      <tr>
+        <th>High Risk Probability — হাই রিস্ক সম্ভাবনা</th>
+        <td class="p-num" id="p-prob-high">
+          {{ (result.probabilities.HIGH * 100)|round(1) if result else '-' }}%
+        </td>
+        <th>Model Confidence — কনফিডেন্স লেভেল</th>
+        <td class="p-num">High / Ensemble Verified (86.2%)</td>
+      </tr>
+    </table>
+
+    <!-- Section 4: Key Risk Drivers -->
+    <div class="p-section-heading">4. Key Risk Drivers — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</div>
+    <ul class="p-drivers-list" id="p-drivers-ul">
+      {% if result and result.insights and result.insights.drivers %}
+        {% for driver in result.insights.drivers %}
+        <li><strong>[{{ 'POSITIVE' if driver.type == 'positive' else ('WARNING' if driver.type == 'warning' else 'CRITICAL') }}]</strong> {{ driver.text }}</li>
+        {% endfor %}
+      {% else %}
+        <li>No active risk drivers loaded.</li>
       {% endif %}
+    </ul>
 
-      <form method="POST" action="/predict">
+    <!-- Section 5: Underwriting Recommendation -->
+    <div class="p-section-heading">5. Underwriting Terms & Recommendation — ক্রেডিট সুপারিশ</div>
+    <div class="p-rec-box">
+      <h4 id="p-rec-title">{{ result.insights.recommendation.title if result and result.insights and result.insights.recommendation else 'Underwriter Review Required' }}</h4>
+      <p id="p-rec-summary">{{ result.insights.recommendation.summary if result and result.insights and result.insights.recommendation else 'Subject to complete documentation verification and clean CIB record.' }}</p>
+    </div>
 
-        <p class="section-title">Business Profile - ব্যবসার প্রোফাইল</p>
-        <div class="grid">
-          <div class="field">
-            <label>Business Age (years) — ব্যবসার বয়স (বছর)</label>
-            <input type="number" step="1" name="business_age_years" required
-              value="{{ form_data.business_age_years if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Owner Experience (years) — মালিকের অভিজ্ঞতা (বছর)</label>
-            <input type="number" step="1" name="owner_experience_years" required
-              value="{{ form_data.owner_experience_years if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Banking Relationship (years) — ব্যাংকিং সম্পর্কের মেয়াদ (বছর)</label>
-            <input type="number" step="1" name="banking_years" required
-              value="{{ form_data.banking_years if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Number of Employees — কর্মচারীর সংখ্যা</label>
-            <input type="number" step="1" name="num_employees" required
-              value="{{ form_data.num_employees if form_data else '' }}">
-          </div>
-        </div>
-
-        <p class="section-title">Financial Information - আর্থিক তথ্য</p>
-        <div class="grid">
-          <div class="field">
-            <label>Annual Revenue (BDT) — বার্ষিক আয় (টাকা)</label>
-            <input type="number" step="any" name="annual_revenue" required
-              value="{{ form_data.annual_revenue if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Loan Amount Requested (BDT) — আবেদনকৃত ঋণের পরিমাণ (টাকা)</label>
-            <input type="number" step="any" name="loan_amount" required
-              value="{{ form_data.loan_amount if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Debt-to-Asset Ratio (0 – 1+) — ঋণ-সম্পদ অনুপাত</label>
-            <input type="number" step="any" name="debt_to_asset_ratio" required
-              value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Collateral Value (BDT, 0 if none) — জামানতের মূল্য (না থাকলে ০)</label>
-            <input type="number" step="any" name="collateral_value" required
-              value="{{ form_data.collateral_value if form_data else '' }}">
-          </div>
-          <div class="field">
-            <label>Past Defaults (count) — অতীত ঋণখেলাপির সংখ্যা</label>
-            <input type="number" step="1" name="past_defaults" required
-              value="{{ form_data.past_defaults if form_data else '0' }}">
-          </div>
-        </div>
-
-        <p class="section-title">Business Location and Sector - অবস্থান ও খাত</p>
-        <div class="grid">
-          <div class="field">
-            <label>District — জেলা</label>
-            <select name="district" required>
-              {% for d in districts %}
-              <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="field">
-            <label>Location Type — অবস্থানের ধরন</label>
-            <select name="location_type" required>
-              {% for lt in location_types %}
-              <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="field">
-            <label>Sector — ব্যবসার খাত</label>
-            <select name="sector" required>
-              {% for s in sectors %}
-              <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <button type="submit">Assess Risk - ঝুঁকি মূল্যায়ন করুন</button>
-      </form>
+    <!-- Official Authorization Signatures -->
+    <div class="p-signature-strip">
+      <div class="p-sig-box">
+        <strong>Prepared By — প্রস্তুতকারী</strong>
+        <span>Credit Analyst (ক্রেডিট অ্যানালিস্ট)</span><br>
+        <span>Signature & Date — স্বাক্ষর ও তারিখ</span>
+      </div>
+      <div class="p-sig-box">
+        <strong>Reviewed By — নিরীক্ষক</strong>
+        <span>Branch Risk Officer (শাখা ঝুঁকি কর্মকর্তা)</span><br>
+        <span>Signature & Date — স্বাক্ষর ও তারিখ</span>
+      </div>
+      <div class="p-sig-box">
+        <strong>Approved By — অনুমোদনকারী</strong>
+        <span>Credit Committee (ক্রেডিট কমিটি সিল ও স্বাক্ষর)</span><br>
+        <span>Official Stamp & Date</span>
+      </div>
     </div>
   </div>
-</body>
 
+  <!-- DRAWER 1: DEVELOPER REST API SPECIFICATION -->
+  <div class="drawer-overlay" id="api-modal">
+    <div class="drawer-dialog">
+      <div class="drawer-header">
+        <h3>Developer REST API Specification — ডেভেলপার এপিআই ডক</h3>
+        <button class="btn-close-modal" onclick="closeModals()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
+          Direct real-time credit scoring integration for CBS & LOS systems: — কোর ব্যাংকিং (CBS) ও লোন অরিজিনেশন সিস্টেমে (LOS) রিয়েল-টাইম ইন্টিগ্রেশনের জন্য নিচের REST এন্ডপয়েন্টটি ব্যবহার করুন:
+        </p>
+
+        <div style="font-size:11.5px; font-weight:700; color:var(--brand-accent);">POST /predict (JSON Payload)</div>
+        <div class="code-console">
+          <button class="copy-code-btn" onclick="copyCode('curl-code')">Copy</button>
+          <pre id="curl-code">curl -X POST http://localhost:5000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "business_age_years": 8,
+    "owner_experience_years": 10,
+    "banking_years": 6,
+    "num_employees": 12,
+    "annual_revenue": 6500000,
+    "loan_amount": 1500000,
+    "debt_to_asset_ratio": 0.35,
+    "collateral_value": 2000000,
+    "past_defaults": 0,
+    "district": "Dhaka",
+    "location_type": "Urban",
+    "sector": "Retail"
+  }'</pre>
+        </div>
+
+        <div style="font-size:11.5px; font-weight:700; color:var(--brand-accent); margin-top:14px;">Response JSON Format</div>
+        <div class="code-console">
+          <pre>{
+  "risk_level": "LOW",
+  "probabilities": {
+    "LOW": 0.885,
+    "MEDIUM": 0.095,
+    "HIGH": 0.020
+  },
+  "insights": {
+    "risk_score": 6.8,
+    "recommendation": {
+      "title": "Standard Prime Terms — ঋণ অনুমোদনযোগ্য"
+    }
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER 2: AUDIT ARCHIVE / HISTORY -->
+  <div class="drawer-overlay" id="history-modal">
+    <div class="drawer-dialog">
+      <div class="drawer-header">
+        <h3>Audit Archive & History — সাম্প্রতিক আন্ডাররাইটিং হিস্ট্রি</h3>
+        <button class="btn-close-modal" onclick="closeModals()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:12px; color:var(--text-muted);">Cached Assessments in Browser — ব্রাউজারে সংরক্ষিত মূল্যায়নসমূহ:</span>
+          <button type="button" class="preset-chip" onclick="clearHistory()">Clear All — মুছে ফেলুন</button>
+        </div>
+        <div id="history-container">
+          <p style="font-size:12px; color:var(--text-muted); text-align:center; padding:24px;">No previous records found — কোনো রেকর্ড সংরক্ষিত নেই।</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // THEME CONTROLLER
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeLabel = document.getElementById('theme-label');
+
+    function updateThemeUI() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeLabel) {
+        themeLabel.textContent = isDark ? 'Light Theme — লাইট' : 'Dark Theme — ডার্ক';
+      }
+    }
+
+    if (themeToggle) {
+      updateThemeUI();
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeUI();
+      });
+    }
+
+    // WORKSPACE VIEW SWITCHER
+    const tabSingle = document.getElementById('tab-single');
+    const tabBatch = document.getElementById('tab-batch');
+    const viewSingle = document.getElementById('view-single');
+    const viewBatch = document.getElementById('view-batch');
+    const presetContainer = document.getElementById('preset-container');
+
+    tabSingle.addEventListener('click', () => {
+      tabSingle.classList.add('active');
+      tabBatch.classList.remove('active');
+      viewSingle.style.display = 'block';
+      viewBatch.style.display = 'none';
+      if (presetContainer) presetContainer.style.display = 'flex';
+    });
+
+    tabBatch.addEventListener('click', () => {
+      tabBatch.classList.add('active');
+      tabSingle.classList.remove('active');
+      viewSingle.style.display = 'none';
+      viewBatch.style.display = 'block';
+      if (presetContainer) presetContainer.style.display = 'none';
+    });
+
+    // ARCHETYPE PRESETS
+    const presets = {
+      low: {
+        business_age: 10,
+        owner_exp: 12,
+        banking_years: 8,
+        employees: 25,
+        revenue: 8500000,
+        loan: 2000000,
+        debt_asset: 0.25,
+        collateral: 3500000,
+        defaults: 0
+      },
+      medium: {
+        business_age: 4,
+        owner_exp: 5,
+        banking_years: 3,
+        employees: 8,
+        revenue: 3200000,
+        loan: 1800000,
+        debt_asset: 0.55,
+        collateral: 1000000,
+        defaults: 0
+      },
+      high: {
+        business_age: 2,
+        owner_exp: 1,
+        banking_years: 1,
+        employees: 3,
+        revenue: 1400000,
+        loan: 3000000,
+        debt_asset: 0.88,
+        collateral: 0,
+        defaults: 2
+      }
+    };
+
+    function loadPreset(type) {
+      const data = presets[type];
+      if (!data) return;
+      document.getElementById('inp_business_age').value = data.business_age;
+      document.getElementById('inp_owner_exp').value = data.owner_exp;
+      document.getElementById('inp_banking_years').value = data.banking_years;
+      document.getElementById('inp_employees').value = data.employees;
+      document.getElementById('inp_revenue').value = data.revenue;
+      document.getElementById('inp_loan').value = data.loan;
+      document.getElementById('inp_debt_asset').value = data.debt_asset;
+      document.getElementById('inp_collateral').value = data.collateral;
+      document.getElementById('inp_defaults').value = data.defaults;
+      updateLiveCalculations();
+    }
+
+    function resetForm() {
+      document.getElementById('risk-form').reset();
+      updateLiveCalculations();
+    }
+
+    // BENGALI BDT FORMATTER (English First - Bengali Second)
+    function formatBDT(amount) {
+      if (!amount || isNaN(amount) || amount <= 0) return '';
+      const num = Number(amount);
+      if (num >= 10000000) {
+        return `BDT ${(num / 10000000).toFixed(2)} Crore — ${(num / 10000000).toFixed(2)} কোটি টাকা`;
+      } else if (num >= 100000) {
+        return `BDT ${(num / 100000).toFixed(2)} Lakh — ${(num / 100000).toFixed(2)} লাখ টাকা`;
+      } else if (num >= 1000) {
+        return `BDT ${(num / 1000).toFixed(1)} Thousand — ${(num / 1000).toFixed(1)} হাজার টাকা`;
+      }
+      return `৳ ${num.toLocaleString('en-IN')}`;
+    }
+
+    // LIVE RATIO CALCULATOR
+    const inpRevenue = document.getElementById('inp_revenue');
+    const inpLoan = document.getElementById('inp_loan');
+    const inpCollateral = document.getElementById('inp_collateral');
+
+    function updateLiveCalculations() {
+      const rev = parseFloat(inpRevenue.value) || 0;
+      const loan = parseFloat(inpLoan.value) || 0;
+      const col = parseFloat(inpCollateral.value) || 0;
+
+      document.getElementById('hint_revenue').textContent = rev > 0 ? formatBDT(rev) : 'Enter Revenue (BDT) — টাকার পরিমাণ লিখুন';
+      document.getElementById('hint_loan').textContent = loan > 0 ? formatBDT(loan) : 'Requested Facility (BDT) — ঋণের পরিমাণ';
+      document.getElementById('hint_collateral').textContent = col > 0 ? formatBDT(col) : 'Immovable Collateral (0 if None) — স্থাবর জামানত (না থাকলে ০)';
+
+      const colCov = loan > 0 ? ((col / loan) * 100).toFixed(1) : '0.0';
+      const loanRev = rev > 0 ? ((loan / rev) * 100).toFixed(1) : '0.0';
+
+      const colTag = document.getElementById('live-collateral-cov');
+      const loanRevTag = document.getElementById('live-loan-rev');
+
+      colTag.textContent = `${colCov}%`;
+      loanRevTag.textContent = `${loanRev}%`;
+
+      // Status Colors
+      colTag.style.color = parseFloat(colCov) >= 100 ? 'var(--safe)' : (parseFloat(colCov) > 50 ? 'var(--caution)' : 'var(--danger)');
+      loanRevTag.style.color = parseFloat(loanRev) <= 50 ? 'var(--safe)' : (parseFloat(loanRev) <= 80 ? 'var(--caution)' : 'var(--danger)');
+    }
+
+    [inpRevenue, inpLoan, inpCollateral].forEach(inp => {
+      if (inp) inp.addEventListener('input', updateLiveCalculations);
+    });
+    updateLiveCalculations();
+
+    // PRINT MEMORANDUM SYNC
+    function executePrint() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      document.getElementById('p-memo-date').textContent = dateStr;
+
+      // Sync form values to print table
+      document.getElementById('p-biz-age').textContent = `${document.getElementById('inp_business_age').value || '-'} Years`;
+      document.getElementById('p-owner-exp').textContent = `${document.getElementById('inp_owner_exp').value || '-'} Years`;
+      document.getElementById('p-banking-age').textContent = `${document.getElementById('inp_banking_years').value || '-'} Years`;
+      document.getElementById('p-employees').textContent = `${document.getElementById('inp_employees').value || '-'}`;
+      document.getElementById('p-location').textContent = `${document.getElementById('inp_district').value || '-'} (${document.getElementById('inp_location').value || '-'})`;
+      document.getElementById('p-sector').textContent = document.getElementById('inp_sector').value || '-';
+
+      document.getElementById('p-loan-amount').textContent = `৳ ${Number(document.getElementById('inp_loan').value || 0).toLocaleString('en-IN')}`;
+      document.getElementById('p-revenue').textContent = `৳ ${Number(document.getElementById('inp_revenue').value || 0).toLocaleString('en-IN')}`;
+      document.getElementById('p-collateral').textContent = `৳ ${Number(document.getElementById('inp_collateral').value || 0).toLocaleString('en-IN')}`;
+      document.getElementById('p-debt-asset').textContent = document.getElementById('inp_debt_asset').value || '-';
+      document.getElementById('p-defaults').textContent = `${document.getElementById('inp_defaults').value || '0'} Times`;
+
+      const loan = parseFloat(document.getElementById('inp_loan').value) || 0;
+      const col = parseFloat(document.getElementById('inp_collateral').value) || 0;
+      const rev = parseFloat(document.getElementById('inp_revenue').value) || 0;
+      
+      if (loan > 0) {
+        document.getElementById('p-col-cov').textContent = `${((col / loan) * 100).toFixed(1)}%`;
+      }
+      if (rev > 0 && loan > 0) {
+        document.getElementById('p-loan-rev').textContent = `${((loan / rev) * 100).toFixed(1)}%`;
+      }
+
+      window.print();
+    }
+
+    // KEYBOARD SHORTCUT: Ctrl + Enter to submit
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const form = document.getElementById('risk-form');
+        if (form && viewSingle.style.display !== 'none') {
+          form.requestSubmit();
+        }
+      }
+    });
+
+    // FORM SUBMISSION STATE
+    const riskForm = document.getElementById('risk-form');
+    if (riskForm) {
+      riskForm.addEventListener('submit', () => {
+        const btn = document.getElementById('submit-btn');
+        const text = document.getElementById('btn-text');
+        if (btn && text) {
+          text.textContent = 'Inference Engine Processing — বিশ্লেষণ চলছে...';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    // MODAL DIALOG CONTROLLER
+    const apiModal = document.getElementById('api-modal');
+    const historyModal = document.getElementById('history-modal');
+
+    document.getElementById('btn-api-docs').addEventListener('click', () => {
+      apiModal.style.display = 'flex';
+    });
+
+    document.getElementById('btn-history').addEventListener('click', () => {
+      renderHistory();
+      historyModal.style.display = 'flex';
+    });
+
+    function closeModals() {
+      apiModal.style.display = 'none';
+      historyModal.style.display = 'none';
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target === apiModal || e.target === historyModal) {
+        closeModals();
+      }
+    });
+
+    function copyCode(elemId) {
+      const code = document.getElementById(elemId).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Code copied to clipboard — কোড ক্লিপবোর্ডে কপি করা হয়েছে!');
+      });
+    }
+
+    // LOCAL ARCHIVE HISTORY
+    function saveToHistory() {
+      const resultBox = document.getElementById('prediction-result-box');
+      if (!resultBox) return;
+
+      const record = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        business_age: document.getElementById('inp_business_age').value,
+        owner_exp: document.getElementById('inp_owner_exp').value,
+        banking_years: document.getElementById('inp_banking_years').value,
+        employees: document.getElementById('inp_employees').value,
+        revenue: document.getElementById('inp_revenue').value,
+        loan: document.getElementById('inp_loan').value,
+        debt_asset: document.getElementById('inp_debt_asset').value,
+        collateral: document.getElementById('inp_collateral').value,
+        defaults: document.getElementById('inp_defaults').value,
+        district: document.getElementById('inp_district').value,
+        location: document.getElementById('inp_location').value,
+        sector: document.getElementById('inp_sector').value,
+        risk: resultBox.classList.contains('LOW') ? 'LOW' : (resultBox.classList.contains('MEDIUM') ? 'MEDIUM' : 'HIGH')
+      };
+
+      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
+      history.unshift(record);
+      if (history.length > 20) history.pop();
+      localStorage.setItem('sme_risk_audit_trail', JSON.stringify(history));
+      alert('Assessment saved to archive — অডিট ট্রেইল আর্কাইভে সংরক্ষিত হয়েছে!');
+    }
+
+    function restoreDossier(recordId) {
+      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
+      const item = history.find(r => r.id === recordId);
+      if (!item) return;
+
+      document.getElementById('inp_business_age').value = item.business_age || '';
+      document.getElementById('inp_owner_exp').value = item.owner_exp || '';
+      document.getElementById('inp_banking_years').value = item.banking_years || '';
+      document.getElementById('inp_employees').value = item.employees || '';
+      document.getElementById('inp_revenue').value = item.revenue || '';
+      document.getElementById('inp_loan').value = item.loan || '';
+      document.getElementById('inp_debt_asset').value = item.debt_asset || '';
+      document.getElementById('inp_collateral').value = item.collateral || '';
+      document.getElementById('inp_defaults').value = item.defaults || '0';
+      if (item.district) document.getElementById('inp_district').value = item.district;
+      if (item.location) document.getElementById('inp_location').value = item.location;
+      if (item.sector) document.getElementById('inp_sector').value = item.sector;
+
+      updateLiveCalculations();
+      closeModals();
+
+      // Switch to single view
+      tabSingle.click();
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('history-container');
+      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
+      if (history.length === 0) {
+        container.innerHTML = '<p style="font-size:12px; color:var(--text-muted); text-align:center; padding:24px;">No previous records found — কোনো রেকর্ড সংরক্ষিত নেই।</p>';
+        return;
+      }
+      container.innerHTML = history.map(item => `
+        <div class="history-card-item">
+          <div class="history-card-info">
+            <strong>Facility: ৳ ${Number(item.loan).toLocaleString('en-IN')} — ${item.sector} (${item.district})</strong>
+            <span>Time: ${item.time} | Audit Dossier ID: #${item.id.toString().slice(-4)}</span>
+          </div>
+          <div class="history-actions">
+            <span class="preset-chip ${item.risk === 'LOW' ? 'prime' : (item.risk === 'MEDIUM' ? 'moderate' : 'subprime')}">${item.risk} RISK</span>
+            <button type="button" class="preset-chip" onclick="restoreDossier(${item.id})">Load into Form — লোড করুন</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('sme_risk_audit_trail');
+      renderHistory();
+    }
+
+    // BATCH CSV PROCESSING & CLIENT-SIDE FILTERING
+    let batchDataStore = [];
+    let currentFilter = 'ALL';
+    const dropzone = document.getElementById('csv-dropzone');
+
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) uploadBatchCSV(e.dataTransfer.files[0]);
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length) uploadBatchCSV(e.target.files[0]);
+    }
+
+    function uploadBatchCSV(file) {
+      if (!file.name.endsWith('.csv')) {
+        alert('Please upload a valid .csv file — একটি বৈধ .csv ফাইল আপলোড করুন।');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const statusBox = document.getElementById('batch-status');
+      const statusText = document.getElementById('batch-status-text');
+      const resultsWrapper = document.getElementById('batch-results-wrapper');
+
+      statusBox.style.display = 'block';
+      statusText.textContent = `${file.name} — Vectorized ML Processing in Progress...`;
+      resultsWrapper.style.display = 'none';
+
+      fetch('/batch_predict', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(res => {
+        statusBox.style.display = 'none';
+        if (res.error) {
+          alert(`Error: ${res.error}`);
+          return;
+        }
+        batchDataStore = res.data;
+        document.getElementById('count-all').textContent = res.total_records;
+
+        let lowCount = 0, medCount = 0, highCount = 0;
+        res.data.forEach(r => {
+          if (r.predicted_risk === 'LOW') lowCount++;
+          else if (r.predicted_risk === 'MEDIUM') medCount++;
+          else highCount++;
+        });
+
+        document.getElementById('kpi-total').textContent = res.total_records;
+        document.getElementById('kpi-low').textContent = lowCount;
+        document.getElementById('kpi-med').textContent = medCount;
+        document.getElementById('kpi-high').textContent = highCount;
+
+        renderBatchTable();
+        resultsWrapper.style.display = 'block';
+      })
+      .catch(err => {
+        statusBox.style.display = 'none';
+        alert(`Server Error — সার্ভার ত্রুটি: ${err}`);
+      });
+    }
+
+    function filterBatchTable(tier) {
+      currentFilter = tier;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderBatchTable();
+    }
+
+    function searchBatchTable() {
+      renderBatchTable();
+    }
+
+    function renderBatchTable() {
+      const tbody = document.getElementById('batch-tbody');
+      const query = (document.getElementById('batch-search-box').value || '').toLowerCase().trim();
+
+      const filtered = batchDataStore.filter(r => {
+        const matchesTier = (currentFilter === 'ALL') || (r.predicted_risk === currentFilter);
+        const matchesQuery = !query || 
+          r.district.toLowerCase().includes(query) || 
+          r.sector.toLowerCase().includes(query) ||
+          r.loan_amount.toString().includes(query);
+        return matchesTier && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No records matched — কোনো রেকর্ড মেলেনি।</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => `
+        <tr>
+          <td class="num">${r.index}</td>
+          <td>${r.district}</td>
+          <td>${r.sector}</td>
+          <td class="num">৳ ${r.loan_amount.toLocaleString('en-IN')}</td>
+          <td class="num">৳ ${r.annual_revenue.toLocaleString('en-IN')}</td>
+          <td>
+            <span class="preset-chip ${r.predicted_risk === 'LOW' ? 'prime' : (r.predicted_risk === 'MEDIUM' ? 'moderate' : 'subprime')}">
+              ${r.predicted_risk}
+            </span>
+          </td>
+          <td class="num"><strong>${r.risk_score}%</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    function exportBatchResultsCSV() {
+      if (!batchDataStore || batchDataStore.length === 0) return;
+      let csvContent = "data:text/csv;charset=utf-8,Index,District,Sector,Loan_Amount,Annual_Revenue,Predicted_Risk,Risk_Score,Prob_Low,Prob_Medium,Prob_High\n";
+      batchDataStore.forEach(r => {
+        csvContent += `${r.index},"${r.district}","${r.sector}",${r.loan_amount},${r.annual_revenue},${r.predicted_risk},${r.risk_score},${r.prob_low},${r.prob_medium},${r.prob_high}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `sme_credit_portfolio_risk_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
 </html>
