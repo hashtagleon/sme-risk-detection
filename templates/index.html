@@ -37,24 +37,27 @@
 
   .page { max-width: 760px; margin: 0 auto; }
 
-  .masthead { margin-bottom: 32px; }
+  .masthead {
+    margin-bottom: 36px;
+    text-align: center;
+  }
   .masthead .eyebrow {
     font-size: 13px;
     color: var(--accent);
     font-weight: 600;
-    letter-spacing: 0.02em;
-    margin: 0 0 6px;
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
   }
   .masthead h1 {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     letter-spacing: -0.01em;
   }
   .masthead p {
     font-size: 15px;
     color: var(--ink-soft);
-    margin: 0;
+    margin: 0 auto;
     max-width: 46ch;
   }
 
@@ -142,9 +145,10 @@
 
   .field label {
     display: block;
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--ink-soft);
     margin-bottom: 6px;
+    line-height: 1.35;
   }
   .field input, .field select {
     width: 100%;
@@ -188,9 +192,9 @@
 <div class="page">
 
   <div class="masthead">
-    <p class="eyebrow">Risk Assessment Tool</p>
+    <p class="eyebrow">ক্রেডিট রিস্ক অ্যাসেসমেন্ট সিস্টেম</p>
     <h1>SME Credit Risk Detection</h1>
-    <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর — LOW, MEDIUM বা HIGH — মুহূর্তেই যাচাই করুন।</p>
+    <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর নির্ধারণের জন্য একটি বিশ্লেষণধর্মী টুল।</p>
   </div>
 
   <div class="card">
@@ -218,19 +222,19 @@
       <p class="section-title">ব্যবসার প্রোফাইল</p>
       <div class="grid">
         <div class="field">
-          <label>Business Age (years)</label>
+          <label>Business Age (years) — ব্যবসার বয়স (বছর)</label>
           <input type="number" step="1" name="business_age_years" required value="{{ form_data.business_age_years if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Owner Experience (years)</label>
+          <label>Owner Experience (years) — মালিকের অভিজ্ঞতা (বছর)</label>
           <input type="number" step="1" name="owner_experience_years" required value="{{ form_data.owner_experience_years if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Banking Relationship (years)</label>
+          <label>Banking Relationship (years) — ব্যাংকিং সম্পর্কের মেয়াদ (বছর)</label>
           <input type="number" step="1" name="banking_years" required value="{{ form_data.banking_years if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Number of Employees</label>
+          <label>Number of Employees — কর্মচারীর সংখ্যা</label>
           <input type="number" step="1" name="num_employees" required value="{{ form_data.num_employees if form_data else '' }}">
         </div>
       </div>
@@ -238,23 +242,23 @@
       <p class="section-title">আর্থিক তথ্য</p>
       <div class="grid">
         <div class="field">
-          <label>Annual Revenue (BDT)</label>
+          <label>Annual Revenue (BDT) — বার্ষিক আয় (টাকা)</label>
           <input type="number" step="any" name="annual_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Loan Amount Requested (BDT)</label>
+          <label>Loan Amount Requested (BDT) — আবেদনকৃত ঋণের পরিমাণ (টাকা)</label>
           <input type="number" step="any" name="loan_amount" required value="{{ form_data.loan_amount if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Debt-to-Asset Ratio (0 – 1+)</label>
+          <label>Debt-to-Asset Ratio (0 – 1+) — ঋণ-সম্পদ অনুপাত</label>
           <input type="number" step="any" name="debt_to_asset_ratio" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Collateral Value (BDT, 0 if none)</label>
+          <label>Collateral Value (BDT, 0 if none) — জামানতের মূল্য (না থাকলে ০)</label>
           <input type="number" step="any" name="collateral_value" required value="{{ form_data.collateral_value if form_data else '' }}">
         </div>
         <div class="field">
-          <label>Past Defaults (count)</label>
+          <label>Past Defaults (count) — অতীত ঋণখেলাপির সংখ্যা</label>
           <input type="number" step="1" name="past_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
         </div>
       </div>
@@ -262,7 +266,7 @@
       <p class="section-title">অবস্থান ও খাত</p>
       <div class="grid">
         <div class="field">
-          <label>District</label>
+          <label>District — জেলা</label>
           <select name="district" required>
             {% for d in districts %}
             <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
@@ -270,7 +274,7 @@
           </select>
         </div>
         <div class="field">
-          <label>Location Type</label>
+          <label>Location Type — অবস্থানের ধরন</label>
           <select name="location_type" required>
             {% for lt in location_types %}
             <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
@@ -278,7 +282,7 @@
           </select>
         </div>
         <div class="field">
-          <label>Sector</label>
+          <label>Sector — ব্যবসার খাত</label>
           <select name="sector" required>
             {% for s in sectors %}
             <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
