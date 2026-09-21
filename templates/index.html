@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SME Credit Risk Detection</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background:#f4f6f8; margin:0; padding:2rem; color:#222; }
+  .container { max-width:720px; margin:0 auto; background:#fff; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+  h1 { font-size:1.5rem; margin-bottom:0.25rem; }
+  p.subtitle { color:#666; margin-top:0; margin-bottom:1.5rem; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  label { font-size:0.85rem; font-weight:600; display:block; margin-bottom:0.25rem; }
+  input, select { width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; font-size:0.9rem; }
+  button { margin-top:1.5rem; background:#2563eb; color:#fff; border:none; padding:0.75rem 1.5rem; border-radius:6px; font-size:1rem; cursor:pointer; }
+  button:hover { background:#1d4ed8; }
+  .result { margin-top:1.5rem; padding:1rem; border-radius:8px; }
+  .result.LOW { background:#e7f7ee; border:1px solid #34a853; }
+  .result.MEDIUM { background:#fff8e1; border:1px solid #f9a825; }
+  .result.HIGH { background:#fdecea; border:1px solid #e53935; }
+  .error { margin-top:1rem; padding:1rem; background:#fdecea; border:1px solid #e53935; border-radius:8px; }
+  .prob-bar { display:flex; align-items:center; gap:0.5rem; margin:0.25rem 0; font-size:0.85rem; }
+  .prob-bar span.label { width:70px; }
+  .prob-bar .bar-bg { flex:1; background:#eee; border-radius:4px; overflow:hidden; height:10px; }
+  .prob-bar .bar-fill { height:100%; background:#2563eb; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏦 SME Credit Risk Detection</h1>
+  <p class="subtitle">ছোট ও মাঝারি উদ্যোক্তাদের ঋণ ঝুঁকি (LOW / MEDIUM / HIGH) পূর্বাভাস</p>
+
+  {% if error %}
+  <div class="error"><strong>Error:</strong> {{ error }}</div>
+  {% endif %}
+
+  {% if result %}
+  <div class="result {{ result.risk_level }}">
+    <h2>Predicted Risk: {{ result.risk_level }}</h2>
+    {% for level, prob in result.probabilities.items() %}
+    <div class="prob-bar">
+      <span class="label">{{ level }}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width: {{ (prob*100)|round(1) }}%;"></div></div>
+      <span>{{ (prob*100)|round(1) }}%</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/predict">
+    <div class="grid">
+      <div>
+        <label>Business Age (years)</label>
+        <input type="number" step="1" name="business_age_years" required value="{{ form_data.business_age_years if form_data else '' }}">
+      </div>
+      <div>
+        <label>Owner Experience (years)</label>
+        <input type="number" step="1" name="owner_experience_years" required value="{{ form_data.owner_experience_years if form_data else '' }}">
+      </div>
+      <div>
+        <label>Banking Relationship (years)</label>
+        <input type="number" step="1" name="banking_years" required value="{{ form_data.banking_years if form_data else '' }}">
+      </div>
+      <div>
+        <label>Annual Revenue (BDT)</label>
+        <input type="number" step="any" name="annual_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}">
+      </div>
+      <div>
+        <label>Loan Amount Requested (BDT)</label>
+        <input type="number" step="any" name="loan_amount" required value="{{ form_data.loan_amount if form_data else '' }}">
+      </div>
+      <div>
+        <label>Debt-to-Asset Ratio (0 - 1+)</label>
+        <input type="number" step="any" name="debt_to_asset_ratio" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
+      </div>
+      <div>
+        <label>Number of Employees</label>
+        <input type="number" step="1" name="num_employees" required value="{{ form_data.num_employees if form_data else '' }}">
+      </div>
+      <div>
+        <label>Collateral Value (BDT, 0 if none)</label>
+        <input type="number" step="any" name="collateral_value" required value="{{ form_data.collateral_value if form_data else '' }}">
+      </div>
+      <div>
+        <label>Past Defaults (count)</label>
+        <input type="number" step="1" name="past_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
+      </div>
+      <div>
+        <label>District</label>
+        <select name="district" required>
+          {% for d in districts %}
+          <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Location Type</label>
+        <select name="location_type" required>
+          {% for lt in location_types %}
+          <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Sector</label>
+        <select name="sector" required>
+          {% for s in sectors %}
+          <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <button type="submit">ঝুঁকি পূর্বাভাস দাও</button>
+  </form>
+</div>
+</body>
+</html>
