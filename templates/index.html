@@ -754,18 +754,40 @@
     .memo-active {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
+    }
+
+    .memo-explainer-banner {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .memo-explainer-banner strong {
+      color: var(--text-primary);
     }
 
     .memo-top-banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
+      padding: 14px 18px;
       border-radius: var(--radius-lg);
-      border: 1px solid;
+      border: 1px solid var(--border-strong);
+      transition: all 0.3s ease;
     }
 
+    .memo-top-banner.STANDBY {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
     .memo-top-banner.LOW {
       background: var(--safe-bg);
       border-color: var(--safe-border);
@@ -784,7 +806,7 @@
 
     .risk-grade-badge {
       font-family: var(--sans-font);
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 800;
       letter-spacing: 0.02em;
       display: flex;
@@ -797,6 +819,7 @@
       height: 10px;
       border-radius: 50%;
     }
+    .STANDBY .badge-indicator-dot { background: var(--text-muted); box-shadow: 0 0 0 3px var(--border-subtle); }
     .LOW .badge-indicator-dot { background: var(--safe); box-shadow: 0 0 0 3px var(--safe-border); }
     .MEDIUM .badge-indicator-dot { background: var(--caution); box-shadow: 0 0 0 3px var(--caution-border); }
     .HIGH .badge-indicator-dot { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-border); }
@@ -808,19 +831,19 @@
       opacity: 0.85;
     }
 
-    /* SVG SPEEDOMETER */
+    /* SVG SPEEDOMETER HUD */
     .gauge-hud-container {
       background: var(--bg-subtle);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 18px 14px;
+      padding: 16px 14px;
       display: grid;
-      grid-template-columns: 160px 1fr;
+      grid-template-columns: 190px 1fr;
       align-items: center;
       gap: 16px;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 520px) {
       .gauge-hud-container {
         grid-template-columns: 1fr;
         text-align: center;
@@ -830,39 +853,77 @@
     .gauge-svg-wrap {
       text-align: center;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .speedometer-svg {
       width: 100%;
-      max-width: 150px;
+      max-width: 185px;
       overflow: visible;
     }
 
+    .gauge-needle-group {
+      transform-origin: 100px 105px;
+      transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
     .gauge-center-stat {
-      margin-top: -12px;
+      margin-top: -6px;
       font-family: var(--mono-font);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--text-primary);
+      letter-spacing: -0.02em;
     }
 
     .gauge-center-label {
       font-size: 11px;
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+    }
+
+    .gauge-tier-pill {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      font-family: var(--sans-font);
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-top: 4px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+    .gauge-tier-pill.safe {
+      background: var(--safe-bg);
+      border-color: var(--safe-border);
+      color: var(--safe-text);
+    }
+    .gauge-tier-pill.caution {
+      background: var(--caution-bg);
+      border-color: var(--caution-border);
+      color: var(--caution-text);
+    }
+    .gauge-tier-pill.danger {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger-text);
     }
 
     .prob-matrix {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .prob-row {
       display: grid;
-      grid-template-columns: 65px 1fr 45px;
+      grid-template-columns: 85px 1fr 45px;
       align-items: center;
       gap: 8px;
       font-size: 11.5px;
@@ -877,7 +938,7 @@
     .prob-row.HIGH .prob-tier-name { color: var(--danger); }
 
     .prob-bar-rail {
-      height: 6px;
+      height: 8px;
       background: var(--border-subtle);
       border-radius: 999px;
       overflow: hidden;
@@ -886,7 +947,7 @@
     .prob-bar-fill {
       height: 100%;
       border-radius: 999px;
-      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .prob-row.LOW .prob-bar-fill { background: var(--safe); }
     .prob-row.MEDIUM .prob-bar-fill { background: var(--caution); }
@@ -894,7 +955,7 @@
 
     .prob-percent {
       font-family: var(--mono-font);
-      font-weight: 600;
+      font-weight: 700;
       text-align: right;
       color: var(--text-primary);
     }
@@ -954,8 +1015,8 @@
     }
     .driver-tag-row.neutral {
       background: var(--bg-subtle);
-      border-color: var(--border-subtle);
-      color: var(--text-secondary);
+      border-color: var(--border-strong);
+      color: var(--text-primary);
     }
 
     .recommendation-card {
@@ -1874,115 +1935,173 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               <h2>Credit Intelligence Memorandum — ক্রেডিট ইন্টেলিজেন্স মেমোরেন্ডাম</h2>
             </div>
-            <span class="panel-badge num">OFFICIAL MEMO</span>
+            <span class="panel-badge num" id="memo-top-badge">OFFICIAL DOSSIER</span>
           </div>
 
           <div class="panel-card-body">
-            {% if result %}
-            <!-- ACTIVE EVALUATION REPORT -->
+            <!-- ACTIVE EVALUATION REPORT (ALWAYS VISIBLE & ANIMATED) -->
             <div class="memo-active" id="prediction-result-box">
               
-              <!-- Decision Status Banner -->
-              <div class="memo-top-banner {{ result.risk_level }}">
+              <!-- Explainer Banner: Clarifies purpose of Memorandum -->
+              <div class="memo-explainer-banner">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" stroke-width="2.2" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                 <div>
-                  <div class="risk-grade-badge">
+                  <strong>AI Credit Underwriting & Risk Dossier:</strong> Real-time assessment of 12 enterprise metrics with calibrated risk scoring, probability distribution, and Bangladesh Bank sanction recommendations.
+                </div>
+              </div>
+
+              <!-- Decision Status Banner -->
+              <div class="memo-top-banner {{ result.risk_level if result else 'STANDBY' }}" id="memo-status-banner">
+                <div>
+                  <div class="risk-grade-badge" id="memo-grade-badge">
                     <span class="badge-indicator-dot"></span>
-                    {% if result.risk_level == 'LOW' %}
-                    <span>LOW RISK (Prime) — ঋণ অনুমোদনযোগ্য (Prime Status)</span>
-                    {% elif result.risk_level == 'MEDIUM' %}
-                    <span>MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)</span>
-                    {% else %}
-                    <span>HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)</span>
-                    {% endif %}
+                    <span id="memo-grade-text">
+                      {% if result %}
+                        {% if result.risk_level == 'LOW' %}
+                        LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Prime Status)
+                        {% elif result.risk_level == 'MEDIUM' %}
+                        MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)
+                        {% else %}
+                        HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)
+                        {% endif %}
+                      {% else %}
+                        STANDBY — টেস্ট প্রোফাইল বা ইনপুট দিন
+                      {% endif %}
+                    </span>
                   </div>
-                  <div style="font-size:12px; margin-top:2px; opacity:0.9;">
-                    Credit Risk Rating — ক্রেডিট রেটিং: <strong>{{ 'GRADE A (Prime)' if result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result.risk_level == 'MEDIUM' else 'GRADE C (Subprime)') }}</strong>
+                  <div style="font-size:12px; margin-top:2px; opacity:0.9;" id="memo-rating-subtext">
+                    Credit Risk Rating — ক্রেডিট রেটিং: <strong id="memo-rating-grade">{{ 'GRADE A (Prime)' if result and result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result and result.risk_level == 'MEDIUM' else ('GRADE C (Subprime)' if result else 'READY')) }}</strong>
                   </div>
                 </div>
                 <div style="text-align:right;">
-                  <div class="memo-dossier-id">DOSSIER #{{ range(1000, 9999)|random }}</div>
-                  <div class="num" style="font-size:11px; opacity:0.8;">{{ result.insights.risk_score if result.insights else '0' }}/100</div>
+                  <div class="memo-dossier-id" id="memo-dossier-tag">DOSSIER #{{ range(1000, 9999)|random }}</div>
+                  <div class="num" style="font-size:11px; opacity:0.8;" id="memo-score-pill">{{ result.insights.risk_score if result and result.insights else '0.0' }}/100</div>
                 </div>
               </div>
 
               <!-- SPEEDOMETER HUD + MULTI-CLASS CONFIDENCE MATRIX -->
-              <div class="gauge-hud-container">
+              <div class="gauge-hud-container" id="gauge-hud">
                 <div class="gauge-svg-wrap">
-                  <svg class="speedometer-svg" viewBox="0 0 160 90">
-                    <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="var(--border-strong)" stroke-width="10" stroke-linecap="round" />
-                    <path d="M 20 80 A 60 60 0 0 1 60 28" fill="none" stroke="var(--safe)" stroke-width="10" stroke-linecap="round" />
-                    <path d="M 60 28 A 60 60 0 0 1 100 28" fill="none" stroke="var(--caution)" stroke-width="10" />
-                    <path d="M 100 28 A 60 60 0 0 1 140 80" fill="none" stroke="var(--danger)" stroke-width="10" stroke-linecap="round" />
+                  <svg class="speedometer-svg" viewBox="0 0 200 120">
+                    <defs>
+                      <filter id="needle-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/>
+                      </filter>
+                    </defs>
+
+                    <!-- Background Base Arc -->
+                    <path d="M 25 105 A 75 75 0 0 1 175 105" fill="none" stroke="var(--border-strong)" stroke-width="12" stroke-linecap="round" />
                     
-                    {% set score = result.insights.risk_score if result.insights else 50 %}
+                    <!-- Safe Zone (0% - 35%): Green -->
+                    <path d="M 25 105 A 75 75 0 0 1 66 38.1" fill="none" stroke="var(--safe)" stroke-width="12" stroke-linecap="round" />
+                    
+                    <!-- Caution Zone (35% - 70%): Amber -->
+                    <path d="M 66 38.1 A 75 75 0 0 1 144.1 44.3" fill="none" stroke="var(--caution)" stroke-width="12" />
+                    
+                    <!-- Danger Zone (70% - 100%): Red -->
+                    <path d="M 144.1 44.3 A 75 75 0 0 1 175 105" fill="none" stroke="var(--danger)" stroke-width="12" stroke-linecap="round" />
+
+                    <!-- Zone Labels & Numbers -->
+                    <text x="22" y="118" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--safe)" text-anchor="middle">0%</text>
+                    <text x="56" y="24" font-size="8.5" font-family="var(--sans-font)" font-weight="700" fill="var(--safe)" text-anchor="middle">SAFE</text>
+                    <text x="100" y="16" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--caution)" text-anchor="middle">50%</text>
+                    <text x="144" y="24" font-size="8.5" font-family="var(--sans-font)" font-weight="700" fill="var(--danger)" text-anchor="middle">DANGER</text>
+                    <text x="178" y="118" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--danger)" text-anchor="middle">100%</text>
+
+                    <!-- Interactive Needle -->
+                    {% set score = result.insights.risk_score if result and result.insights else 0 %}
                     {% set angle = (score / 100 * 180) - 90 %}
-                    <g transform="translate(80, 80) rotate({{ angle }})">
-                      <line x1="0" y1="0" x2="0" y2="-50" stroke="var(--text-primary)" stroke-width="3.5" stroke-linecap="round" />
-                      <circle cx="0" cy="0" r="5" fill="var(--text-primary)" />
+                    <g id="gauge-needle" class="gauge-needle-group" transform="rotate({{ angle }} 100 105)" filter="url(#needle-shadow)">
+                      <polygon points="97,105 100,32 103,105" fill="var(--text-primary)" />
+                      <circle cx="100" cy="105" r="7" fill="var(--text-primary)" />
+                      <circle cx="100" cy="105" r="3" fill="var(--surface)" />
                     </g>
                   </svg>
-                  <div class="gauge-center-stat">{{ score }}%</div>
-                  <div class="gauge-center-label">Risk Score — রিস্ক স্কোর</div>
+                  
+                  <div class="gauge-center-stat" id="gauge-center-stat"><span id="gauge-score-val">{{ score }}</span>%</div>
+                  <div class="gauge-center-label">Risk Index — রিস্ক ইনডেক্স</div>
+                  <div id="gauge-tier-pill" class="gauge-tier-pill {{ 'safe' if score < 35 and result else ('caution' if score < 70 and result else ('danger' if result else '')) }}">
+                    <span id="gauge-tier-label">{{ 'SAFE (Prime)' if score < 35 and result else ('WATCH (Moderate)' if score < 70 and result else ('CRITICAL (Subprime)' if result else 'READY TO ASSESS')) }}</span>
+                  </div>
                 </div>
 
                 <!-- Multi-class Probability Breakdown -->
                 <div class="prob-matrix">
-                  {% for level, prob in result.probabilities.items() %}
-                  <div class="prob-row {{ level }}">
-                    <span class="prob-tier-name">{{ level }} RISK</span>
+                  <div class="prob-row LOW">
+                    <span class="prob-tier-name">LOW RISK</span>
                     <div class="prob-bar-rail">
-                      <div class="prob-bar-fill" style="width: {{ (prob*100)|round(1) }}%;"></div>
+                      <div class="prob-bar-fill" id="prob-bar-low" style="width: {{ (result.probabilities.LOW * 100)|round(1) if result else 0 }}%;"></div>
                     </div>
-                    <span class="prob-percent">{{ (prob*100)|round(1) }}%</span>
+                    <span class="prob-percent" id="prob-val-low">{{ (result.probabilities.LOW * 100)|round(1) if result else 0 }}%</span>
                   </div>
-                  {% endfor %}
+                  <div class="prob-row MEDIUM">
+                    <span class="prob-tier-name">MEDIUM</span>
+                    <div class="prob-bar-rail">
+                      <div class="prob-bar-fill" id="prob-bar-med" style="width: {{ (result.probabilities.MEDIUM * 100)|round(1) if result else 0 }}%;"></div>
+                    </div>
+                    <span class="prob-percent" id="prob-val-med">{{ (result.probabilities.MEDIUM * 100)|round(1) if result else 0 }}%</span>
+                  </div>
+                  <div class="prob-row HIGH">
+                    <span class="prob-tier-name">HIGH RISK</span>
+                    <div class="prob-bar-rail">
+                      <div class="prob-bar-fill" id="prob-bar-high" style="width: {{ (result.probabilities.HIGH * 100)|round(1) if result else 0 }}%;"></div>
+                    </div>
+                    <span class="prob-percent" id="prob-val-high">{{ (result.probabilities.HIGH * 100)|round(1) if result else 0 }}%</span>
+                  </div>
                 </div>
               </div>
 
-              <!-- RISK DRIVERS -->
-              {% if result.insights and result.insights.drivers %}
+              <!-- KEY RISK DRIVERS (XAI) -->
               <div class="drivers-block">
                 <div class="block-heading">
-                  <span>Key Risk Drivers — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</span>
-                  <span>{{ result.insights.drivers|length }} Drivers Detected — শনাক্তকৃত ফ্যাক্টর</span>
+                  <span>Key Risk Drivers (XAI) — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</span>
+                  <span id="drivers-count-badge">{{ result.insights.drivers|length if result and result.insights and result.insights.drivers else 0 }} Factors — ফ্যাক্টর</span>
                 </div>
-                <div class="drivers-tag-list">
-                  {% for driver in result.insights.drivers %}
-                  <div class="driver-tag-row {{ driver.type }}">
-                    {% if driver.type == 'positive' %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    {% elif driver.type == 'warning' %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-                    {% elif driver.type == 'negative' %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                    {% else %}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    {% endif %}
-                    <span>{{ driver.text }}</span>
-                  </div>
-                  {% endfor %}
+                <div class="drivers-tag-list" id="drivers-list-container">
+                  {% if result and result.insights and result.insights.drivers %}
+                    {% for driver in result.insights.drivers %}
+                    <div class="driver-tag-row {{ driver.type }}">
+                      {% if driver.type == 'positive' %}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      {% elif driver.type == 'warning' %}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+                      {% elif driver.type == 'negative' %}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                      {% else %}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      {% endif %}
+                      <span>{{ driver.text }}</span>
+                    </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="driver-tag-row neutral">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <span>Awaiting appraisal input — টেস্ট প্রোফাইলে ক্লিক করুন অথবা তথ্য দিন</span>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
-              {% endif %}
 
               <!-- RECOMMENDATION BOX -->
-              {% if result.insights and result.insights.recommendation %}
-              <div class="recommendation-card">
-                <div class="rec-symbol">
-                  {% if result.risk_level == 'LOW' %}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                  {% elif result.risk_level == 'MEDIUM' %}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <div class="recommendation-card" id="recommendation-card">
+                <div class="rec-symbol" id="rec-symbol-box">
+                  {% if result %}
+                    {% if result.risk_level == 'LOW' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    {% elif result.risk_level == 'MEDIUM' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                    {% endif %}
                   {% else %}
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
                   {% endif %}
                 </div>
                 <div class="rec-body">
-                  <h4>Underwriting Recommendation — {{ result.insights.recommendation.title }}</h4>
-                  <p>{{ result.insights.recommendation.summary }}</p>
+                  <h4 id="rec-title">{{ result.insights.recommendation.title if result and result.insights and result.insights.recommendation else 'Underwriting Terms & Recommendation — ক্রেডিট সুপারিশ' }}</h4>
+                  <p id="rec-summary">{{ result.insights.recommendation.summary if result and result.insights and result.insights.recommendation else 'Fill in borrower inputs on the left console or select a Quick Preset above to generate automated credit sanction recommendations.' }}</p>
                 </div>
               </div>
-              {% endif %}
 
               <!-- ACTIONS -->
               <div class="memo-actions-strip">
@@ -1997,31 +2116,6 @@
               </div>
 
             </div>
-            {% else %}
-            <!-- IDLE STATE -->
-            <div class="memo-idle-state">
-              <div class="idle-icon-wrap">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-              </div>
-              <h3>Assessment Pending — মূল্যায়ন মুলতুবি রয়েছে</h3>
-              <p>Fill in the underwriting inputs on the left console and click "Run Risk Appraisal" to generate the ML decision memorandum. — বাম পাশের কনসোলে তথ্য প্রদান করে "ঝুঁকি বিশ্লেষণ" বাটনে ক্লিক করুন।</p>
-              
-              <div class="idle-checklist">
-                <div class="idle-checklist-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Automated Collateral Coverage (LTV) — স্বয়ংক্ৰিয় জামানত কভারেজ হিসাব</span>
-                </div>
-                <div class="idle-checklist-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Loan-to-Turnover Exposure Matrix — লোন-টু-টার্নওভার রিস্ক এক্সপোজার</span>
-                </div>
-                <div class="idle-checklist-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Explainable Feature Risk Drivers (XAI) — রিস্ক ড্রাইভার ডিকম্পোজিশন</span>
-                </div>
-              </div>
-            </div>
-            {% endif %}
           </div>
         </div>
 
@@ -2465,12 +2559,16 @@
       document.getElementById('inp_debt_asset').value = data.debt_asset;
       document.getElementById('inp_collateral').value = data.collateral;
       document.getElementById('inp_defaults').value = data.defaults;
+      
       updateLiveCalculations();
+      // Run instant ML appraisal on preset click!
+      runAppraisalAsync();
     }
 
     function resetForm() {
       document.getElementById('risk-form').reset();
       updateLiveCalculations();
+      resetMemorandumToStandby();
     }
 
     // BENGALI BDT FORMATTER (English First - Bengali Second)
@@ -2507,18 +2605,300 @@
       const colTag = document.getElementById('live-collateral-cov');
       const loanRevTag = document.getElementById('live-loan-rev');
 
-      colTag.textContent = `${colCov}%`;
-      loanRevTag.textContent = `${loanRev}%`;
-
-      // Status Colors
-      colTag.style.color = parseFloat(colCov) >= 100 ? 'var(--safe)' : (parseFloat(colCov) > 50 ? 'var(--caution)' : 'var(--danger)');
-      loanRevTag.style.color = parseFloat(loanRev) <= 50 ? 'var(--safe)' : (parseFloat(loanRev) <= 80 ? 'var(--caution)' : 'var(--danger)');
+      if (colTag) {
+        colTag.textContent = `${colCov}%`;
+        colTag.style.color = parseFloat(colCov) >= 100 ? 'var(--safe)' : (parseFloat(colCov) > 50 ? 'var(--caution)' : 'var(--danger)');
+      }
+      if (loanRevTag) {
+        loanRevTag.textContent = `${loanRev}%`;
+        loanRevTag.style.color = parseFloat(loanRev) <= 50 ? 'var(--safe)' : (parseFloat(loanRev) <= 80 ? 'var(--caution)' : 'var(--danger)');
+      }
     }
 
     [inpRevenue, inpLoan, inpCollateral].forEach(inp => {
       if (inp) inp.addEventListener('input', updateLiveCalculations);
     });
     updateLiveCalculations();
+
+    // ASYNC REAL-TIME UNDERWRITING INFERENCE
+    let currentAppraisalData = null;
+
+    async function runAppraisalAsync() {
+      const form = document.getElementById('risk-form');
+      if (!form) return;
+
+      const formData = new FormData(form);
+      const payload = {};
+      formData.forEach((value, key) => {
+        payload[key] = value;
+      });
+
+      const btn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      if (btnText) btnText.textContent = 'Inference Engine Processing — বিশ্লেষণ চলছে...';
+      if (btn) btn.disabled = true;
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error('Prediction request failed: ' + response.statusText);
+        }
+
+        const res = await response.json();
+        currentAppraisalData = res;
+        updateMemorandumUI(res, payload);
+      } catch (err) {
+        console.error('Appraisal error:', err);
+      } finally {
+        if (btnText) btnText.textContent = 'Run Risk Appraisal & Generate Memo — ঝুঁকি বিশ্লেষণ ও ক্রেডিট মেমো তৈরি করুন';
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function updateMemorandumUI(res, inputData) {
+      if (!res || !res.risk_level) return;
+      const risk = res.risk_level;
+      const insights = res.insights || {};
+      const score = Number(insights.risk_score || 0);
+      const probs = res.probabilities || {};
+
+      // 1. Top Status Banner
+      const banner = document.getElementById('memo-status-banner');
+      if (banner) {
+        banner.className = `memo-top-banner ${risk}`;
+      }
+
+      const gradeText = document.getElementById('memo-grade-text');
+      if (gradeText) {
+        if (risk === 'LOW') {
+          gradeText.textContent = 'LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Prime Status)';
+        } else if (risk === 'MEDIUM') {
+          gradeText.textContent = 'MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)';
+        } else {
+          gradeText.textContent = 'HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)';
+        }
+      }
+
+      const ratingGrade = document.getElementById('memo-rating-grade');
+      if (ratingGrade) {
+        ratingGrade.textContent = risk === 'LOW' ? 'GRADE A (Prime)' : (risk === 'MEDIUM' ? 'GRADE B (Moderate Watch)' : 'GRADE C (Subprime)');
+      }
+
+      const scorePill = document.getElementById('memo-score-pill');
+      if (scorePill) {
+        scorePill.textContent = `${score.toFixed(1)}/100`;
+      }
+
+      // 2. Animated Speedometer Needle & Score Counter
+      const needle = document.getElementById('gauge-needle');
+      if (needle) {
+        const angle = (score / 100 * 180) - 90;
+        needle.setAttribute('transform', `rotate(${angle.toFixed(1)} 100 105)`);
+      }
+
+      const scoreVal = document.getElementById('gauge-score-val');
+      if (scoreVal) {
+        animateCountUp(scoreVal, score);
+      }
+
+      const tierPill = document.getElementById('gauge-tier-pill');
+      const tierLabel = document.getElementById('gauge-tier-label');
+      if (tierPill && tierLabel) {
+        if (score < 35) {
+          tierPill.className = 'gauge-tier-pill safe';
+          tierLabel.textContent = 'SAFE (Prime)';
+        } else if (score < 70) {
+          tierPill.className = 'gauge-tier-pill caution';
+          tierLabel.textContent = 'WATCH (Moderate)';
+        } else {
+          tierPill.className = 'gauge-tier-pill danger';
+          tierLabel.textContent = 'CRITICAL (Subprime)';
+        }
+      }
+
+      // 3. Multi-Class Probability Bars
+      const pLow = (probs.LOW || 0) * 100;
+      const pMed = (probs.MEDIUM || 0) * 100;
+      const pHigh = (probs.HIGH || 0) * 100;
+
+      const barLow = document.getElementById('prob-bar-low');
+      const valLow = document.getElementById('prob-val-low');
+      if (barLow) barLow.style.width = `${pLow.toFixed(1)}%`;
+      if (valLow) valLow.textContent = `${pLow.toFixed(1)}%`;
+
+      const barMed = document.getElementById('prob-bar-med');
+      const valMed = document.getElementById('prob-val-med');
+      if (barMed) barMed.style.width = `${pMed.toFixed(1)}%`;
+      if (valMed) valMed.textContent = `${pMed.toFixed(1)}%`;
+
+      const barHigh = document.getElementById('prob-bar-high');
+      const valHigh = document.getElementById('prob-val-high');
+      if (barHigh) barHigh.style.width = `${pHigh.toFixed(1)}%`;
+      if (valHigh) valHigh.textContent = `${pHigh.toFixed(1)}%`;
+
+      // 4. Key Risk Drivers
+      const driversContainer = document.getElementById('drivers-list-container');
+      const countBadge = document.getElementById('drivers-count-badge');
+      if (driversContainer && insights.drivers) {
+        if (countBadge) countBadge.textContent = `${insights.drivers.length} Factors — ফ্যাক্টর`;
+        driversContainer.innerHTML = insights.drivers.map(d => {
+          let iconSvg = '';
+          if (d.type === 'positive') {
+            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          } else if (d.type === 'warning') {
+            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>';
+          } else if (d.type === 'negative') {
+            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+          } else {
+            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+          }
+          return `<div class="driver-tag-row ${d.type}">${iconSvg}<span>${d.text}</span></div>`;
+        }).join('');
+      }
+
+      // 5. Underwriting Recommendation Card
+      const recTitle = document.getElementById('rec-title');
+      const recSummary = document.getElementById('rec-summary');
+      const recSymbol = document.getElementById('rec-symbol-box');
+      if (insights.recommendation) {
+        if (recTitle) recTitle.textContent = `Underwriting Recommendation — ${insights.recommendation.title}`;
+        if (recSummary) recSummary.textContent = insights.recommendation.summary;
+        if (recSymbol) {
+          if (risk === 'LOW') {
+            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+          } else if (risk === 'MEDIUM') {
+            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
+          } else {
+            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
+          }
+        }
+      }
+
+      // 6. Sync Printable Credit Memo
+      syncPrintMemo(res, inputData);
+    }
+
+    function resetMemorandumToStandby() {
+      const banner = document.getElementById('memo-status-banner');
+      if (banner) banner.className = 'memo-top-banner STANDBY';
+
+      const gradeText = document.getElementById('memo-grade-text');
+      if (gradeText) gradeText.textContent = 'STANDBY — টেস্ট প্রোফাইল বা ইনপুট দিন';
+
+      const ratingGrade = document.getElementById('memo-rating-grade');
+      if (ratingGrade) ratingGrade.textContent = 'READY';
+
+      const scorePill = document.getElementById('memo-score-pill');
+      if (scorePill) scorePill.textContent = '0.0/100';
+
+      const needle = document.getElementById('gauge-needle');
+      if (needle) needle.setAttribute('transform', 'rotate(-90 100 105)');
+
+      const scoreVal = document.getElementById('gauge-score-val');
+      if (scoreVal) scoreVal.textContent = '0.0';
+
+      const tierPill = document.getElementById('gauge-tier-pill');
+      const tierLabel = document.getElementById('gauge-tier-label');
+      if (tierPill && tierLabel) {
+        tierPill.className = 'gauge-tier-pill';
+        tierLabel.textContent = 'READY TO ASSESS';
+      }
+
+      ['low', 'med', 'high'].forEach(t => {
+        const bar = document.getElementById(`prob-bar-${t}`);
+        const val = document.getElementById(`prob-val-${t}`);
+        if (bar) bar.style.width = '0%';
+        if (val) val.textContent = '0%';
+      });
+
+      const driversContainer = document.getElementById('drivers-list-container');
+      const countBadge = document.getElementById('drivers-count-badge');
+      if (countBadge) countBadge.textContent = '0 Factors — ফ্যাক্টর';
+      if (driversContainer) {
+        driversContainer.innerHTML = '<div class="driver-tag-row neutral"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>Awaiting appraisal input — টেস্ট প্রোফাইলে ক্লিক করুন অথবা তথ্য দিন</span></div>';
+      }
+    }
+
+    function animateCountUp(element, targetVal) {
+      const duration = 750;
+      const startTime = performance.now();
+      const startVal = parseFloat(element.textContent) || 0;
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = startVal + (targetVal - startVal) * ease;
+        element.textContent = current.toFixed(1);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          element.textContent = targetVal.toFixed(1);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function syncPrintMemo(res, inputData) {
+      const risk = res ? res.risk_level : '';
+      const insights = res ? res.insights : {};
+
+      const decText = document.getElementById('p-decision-text');
+      const decTier = document.getElementById('p-decision-tier');
+      const decScore = document.getElementById('p-decision-score');
+
+      if (decText) {
+        if (risk === 'LOW') {
+          decText.textContent = '[APPROVED] LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Standard Prime Terms)';
+        } else if (risk === 'MEDIUM') {
+          decText.textContent = '[CONDITIONAL] MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা ও বর্ধিত জামানত';
+        } else if (risk === 'HIGH') {
+          decText.textContent = '[REJECT / HIGH RISK] SUBPRIME — সাবপ্রাইম ঝুঁকি ও উচ্চ খেলাপি সম্ভাবনা';
+        }
+      }
+
+      if (decTier) {
+        decTier.textContent = risk === 'LOW' ? 'GRADE A (Prime)' : (risk === 'MEDIUM' ? 'GRADE B (Moderate Watch)' : 'GRADE C (Subprime)');
+      }
+
+      if (decScore && insights.risk_score !== undefined) {
+        decScore.textContent = `${insights.risk_score}%`;
+      }
+
+      if (res && res.probabilities) {
+        const pLow = document.getElementById('p-prob-low');
+        const pMed = document.getElementById('p-prob-med');
+        const pHigh = document.getElementById('p-prob-high');
+        if (pLow) pLow.textContent = `${((res.probabilities.LOW || 0) * 100).toFixed(1)}%`;
+        if (pMed) pMed.textContent = `${((res.probabilities.MEDIUM || 0) * 100).toFixed(1)}%`;
+        if (pHigh) pHigh.textContent = `${((res.probabilities.HIGH || 0) * 100).toFixed(1)}%`;
+      }
+
+      if (insights.drivers) {
+        const ul = document.getElementById('p-drivers-ul');
+        if (ul) {
+          ul.innerHTML = insights.drivers.map(d => {
+            const tag = d.type === 'positive' ? 'POSITIVE' : (d.type === 'warning' ? 'WARNING' : 'CRITICAL');
+            return `<li><strong>[${tag}]</strong> ${d.text}</li>`;
+          }).join('');
+        }
+      }
+
+      if (insights.recommendation) {
+        const rTitle = document.getElementById('p-rec-title');
+        const rSum = document.getElementById('p-rec-summary');
+        if (rTitle) rTitle.textContent = insights.recommendation.title;
+        if (rSum) rSum.textContent = insights.recommendation.summary;
+      }
+    }
 
     // PRINT MEMORANDUM SYNC
     function executePrint() {
@@ -2554,28 +2934,23 @@
       window.print();
     }
 
+    // FORM SUBMISSION (INTERCEPTED FOR SILKY SMOOTH ASYNC APPRAISAL)
+    const riskForm = document.getElementById('risk-form');
+    if (riskForm) {
+      riskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        runAppraisalAsync();
+      });
+    }
+
     // KEYBOARD SHORTCUT: Ctrl + Enter to submit
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        const form = document.getElementById('risk-form');
-        if (form && viewSingle.style.display !== 'none') {
-          form.requestSubmit();
+        if (viewSingle.style.display !== 'none') {
+          runAppraisalAsync();
         }
       }
     });
-
-    // FORM SUBMISSION STATE
-    const riskForm = document.getElementById('risk-form');
-    if (riskForm) {
-      riskForm.addEventListener('submit', () => {
-        const btn = document.getElementById('submit-btn');
-        const text = document.getElementById('btn-text');
-        if (btn && text) {
-          text.textContent = 'Inference Engine Processing — বিশ্লেষণ চলছে...';
-          btn.disabled = true;
-        }
-      });
-    }
 
     // MODAL DIALOG CONTROLLER
     const apiModal = document.getElementById('api-modal');
