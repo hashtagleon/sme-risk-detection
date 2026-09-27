@@ -1,3197 +1,748 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SME Credit Risk Intelligence & Underwriting Terminal</title>
+  <title>SME Risk Detector</title>
   
-  <!-- Typography: Plus Jakarta Sans for UI/Numbers + Hind Siliguri for Bengali -->
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Inter / System UI Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script>
-    (function () {
-      const savedTheme = localStorage.getItem('theme');
-      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-    })();
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      /* Light Theme (Swiss Institutional FinTech) */
-      --bg-base: #F8FAFC;
-      --bg-subtle: #F1F5F9;
-      --surface: #FFFFFF;
-      --surface-elevated: #FFFFFF;
-      --surface-hover: #F8FAFC;
-      --border-subtle: #E2E8F0;
-      --border-strong: #CBD5E1;
-      --border-focus: #2563EB;
-      
-      --text-primary: #0F172A;
-      --text-secondary: #475569;
-      --text-muted: #64748B;
-      --text-dim: #94A3B8;
-
-      --brand-primary: #1E40AF;
-      --brand-primary-hover: #1D4ED8;
-      --brand-accent: #0284C7;
-      --brand-accent-subtle: rgba(2, 132, 199, 0.08);
-
-      --safe: #059669;
-      --safe-bg: #ECFDF5;
-      --safe-border: #A7F3D0;
-      --safe-text: #065F46;
-
-      --caution: #D97706;
-      --caution-bg: #FFFBEB;
-      --caution-border: #FDE68A;
-      --caution-text: #92400E;
-
-      --danger: #DC2626;
-      --danger-bg: #FEF2F2;
-      --danger-border: #FECACA;
-      --danger-text: #991B1B;
-
-      --mono-font: 'JetBrains Mono', monospace;
-      --sans-font: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      --bn-font: 'Hind Siliguri', sans-serif;
-
-      --card-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
-      --card-shadow-elevated: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-      --grid-pattern: rgba(148, 163, 184, 0.15);
-      
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 18px;
-    }
-
-    [data-theme="dark"] {
-      /* Dark Theme (Institutional Obsidian Carbon) */
-      --bg-base: #0B0F19;
-      --bg-subtle: #070A10;
-      --surface: #111827;
-      --surface-elevated: #182234;
-      --surface-hover: #1E293B;
-      --border-subtle: #1F293D;
-      --border-strong: #334155;
-      --border-focus: #38BDF8;
-
-      --text-primary: #F8FAFC;
-      --text-secondary: #CBD5E1;
-      --text-muted: #94A3B8;
-      --text-dim: #64748B;
-
-      --brand-primary: #3B82F6;
-      --brand-primary-hover: #60A5FA;
-      --brand-accent: #38BDF8;
-      --brand-accent-subtle: rgba(56, 189, 248, 0.12);
-
-      --safe: #10B981;
-      --safe-bg: rgba(16, 185, 129, 0.12);
-      --safe-border: rgba(16, 185, 129, 0.25);
-      --safe-text: #34D399;
-
-      --caution: #F59E0B;
-      --caution-bg: rgba(245, 158, 11, 0.12);
-      --caution-border: rgba(245, 158, 11, 0.25);
-      --caution-text: #FBBF24;
-
-      --danger: #F43F5E;
-      --danger-bg: rgba(244, 63, 94, 0.12);
-      --danger-border: rgba(244, 63, 94, 0.25);
-      --danger-text: #FB7185;
-
-      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-      --card-shadow-elevated: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-      --grid-pattern: rgba(255, 255, 255, 0.04);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
-      font-family: var(--bn-font);
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.5;
-      font-size: 14px;
-      position: relative;
-      background-image: 
-        linear-gradient(to right, var(--grid-pattern) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--grid-pattern) 1px, transparent 1px);
-      background-size: 32px 32px;
-      background-position: center top;
-      transition: background-color 0.25s ease, color 0.25s ease;
-      -webkit-font-smoothing: antialiased;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f4f6f9;
+      color: #334155;
+      margin: 0;
+      padding-bottom: 40px;
     }
 
-    .num, .amount, [data-num] {
-      font-family: var(--mono-font);
-      font-feature-settings: "tnum";
-      font-variant-numeric: tabular-nums;
-    }
-
-    .terminal-shell {
-      max-width: 1420px;
-      margin: 0 auto;
-      padding: 16px 20px 60px;
-    }
-
-    /* TOP BAR */
-    .top-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      padding: 12px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      margin-bottom: 20px;
-      box-shadow: var(--card-shadow);
-    }
-
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, #1E40AF, #0284C7);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.28);
-    }
-
-    .brand-title-group h1 {
-      font-family: var(--sans-font);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .version-pill {
-      font-family: var(--mono-font);
-      font-size: 10px;
+    /* Top Blue Navbar */
+    .top-navbar {
+      background-color: #0066ff;
+      color: #ffffff;
+      padding: 14px 24px;
       font-weight: 600;
-      background: var(--bg-subtle);
-      color: var(--text-muted);
-      padding: 2px 7px;
-      border-radius: 4px;
-      border: 1px solid var(--border-subtle);
-      letter-spacing: 0.02em;
+      font-size: 17px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
-    .telemetry-bar {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
+    .main-container {
+      max-width: 800px;
+      margin: 28px auto;
+      padding: 0 16px;
     }
 
-    .telemetry-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    /* Header title & step badge */
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--safe);
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px var(--safe-bg);
-      animation: pulse-dot 2s infinite ease-in-out;
+    .page-subtitle {
+      font-size: 13.5px;
+      color: #64748b;
+      margin-bottom: 0;
     }
 
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(0.9); }
-    }
-
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .header-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 7px 12px;
-      border-radius: var(--radius-sm);
-      font-family: var(--sans-font);
+    .step-badge {
+      background-color: #e0edff;
+      color: #0066ff;
       font-size: 12.5px;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .header-btn:hover {
-      background: var(--surface-hover);
-      color: var(--text-primary);
-      border-color: var(--border-strong);
-    }
-
-    .theme-toggle-btn .sun-icon { display: none; color: #F59E0B; }
-    .theme-toggle-btn .moon-icon { display: flex; color: #818CF8; }
-    [data-theme="dark"] .theme-toggle-btn .sun-icon { display: flex; }
-    [data-theme="dark"] .theme-toggle-btn .moon-icon { display: none; }
-
-    /* WORKSPACE SUB-NAV */
-    .workspace-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .view-segmented-control {
-      display: flex;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 3px;
-      gap: 2px;
-      box-shadow: var(--card-shadow);
-    }
-
-    .seg-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
       padding: 6px 14px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-family: var(--sans-font);
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .seg-btn svg { opacity: 0.8; }
-
-    .seg-btn.active {
-      background: var(--surface-elevated);
-      color: var(--brand-primary);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      border: 1px solid var(--border-subtle);
-    }
-    .seg-btn.active svg { opacity: 1; }
-    [data-theme="dark"] .seg-btn.active {
-      background: var(--surface-hover);
-      color: #38BDF8;
-      border-color: var(--border-strong);
-    }
-
-    .quick-preset-deck {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .preset-label {
-      font-size: 11.5px;
-      color: var(--text-dim);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .preset-chip {
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      font-family: var(--sans-font);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 5px 10px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all 0.15s ease;
+      border-radius: 20px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    .preset-chip:hover {
-      border-color: var(--border-strong);
-      transform: translateY(-1px);
-      box-shadow: var(--card-shadow);
-    }
-
-    .preset-chip.prime:hover { border-color: var(--safe); color: var(--safe); }
-    .preset-chip.moderate:hover { border-color: var(--caution); color: var(--caution); }
-    .preset-chip.subprime:hover { border-color: var(--danger); color: var(--danger); }
-
-    .preset-icon-badge {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .preset-icon-badge.safe { background: var(--safe-bg); color: var(--safe); }
-    .preset-icon-badge.caution { background: var(--caution-bg); color: var(--caution); }
-    .preset-icon-badge.danger { background: var(--danger-bg); color: var(--danger); }
-
-    /* WORKSPACE GRID: 2-COLUMN SPLIT */
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    @media (max-width: 1080px) {
-      .workspace-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* CARD CONTAINER */
-    .panel-card {
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--card-shadow);
-      overflow: hidden;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .panel-card:hover {
-      border-color: var(--border-strong);
-    }
-
-    .panel-card-header {
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg-subtle);
-    }
-
-    .panel-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .panel-title-wrap h2 {
-      font-size: 13.5px;
-      font-weight: 700;
-      font-family: var(--sans-font);
-      color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .panel-badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-    }
-
-    .panel-card-body {
-      padding: 22px;
-    }
-
-    /* FORM ARCHITECTURE */
-    .form-section {
-      margin-bottom: 22px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .form-section:last-of-type {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .section-legend {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--sans-font);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--brand-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 14px;
-    }
-    [data-theme="dark"] .section-legend {
-      color: var(--brand-accent);
-    }
-
-    .section-legend-num {
-      width: 20px;
-      height: 20px;
-      background: var(--brand-accent-subtle);
-      color: inherit;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10.5px;
-      font-family: var(--mono-font);
-      font-weight: 700;
-    }
-
-    .fields-grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .fields-grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
-
-    @media (max-width: 640px) {
-      .fields-grid-3, .fields-grid-2 {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .input-control {
-      display: flex;
-      flex-direction: column;
       gap: 5px;
     }
 
-    .input-control label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
+    /* Form Section Cards */
+    .form-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .section-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-    }
-
-    .input-control label .en-tag {
-      font-family: var(--sans-font);
-      color: var(--text-primary);
-      font-weight: 700;
-      font-size: 11.5px;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-wrapper .prefix {
-      position: absolute;
-      left: 10px;
-      font-family: var(--mono-font);
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 13px;
-      pointer-events: none;
-    }
-
-    .input-wrapper input,
-    .input-control select {
-      width: 100%;
-      height: 38px;
-      padding: 0 12px;
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      color: var(--text-primary);
-      font-family: var(--sans-font);
-      font-weight: 500;
-      transition: all 0.15s ease;
-    }
-
-    .input-wrapper.has-prefix input {
-      padding-left: 26px;
-    }
-
-    .input-wrapper input:focus,
-    .input-control select:focus {
-      outline: none;
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--brand-accent-subtle);
-      background: var(--surface);
-    }
-
-    .input-micro-hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      min-height: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Live Ratio Assessment Strip */
-    .ratio-strip {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-top: 14px;
-      padding: 12px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      margin-bottom: 18px;
     }
 
-    .ratio-metric {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .ratio-label {
-      font-size: 11.5px;
-      color: var(--text-secondary);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .ratio-val-tag {
-      font-family: var(--mono-font);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-    }
-
-    /* Form Action Bar - Centered */
-    .form-action-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      margin-top: 24px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border-subtle);
-      flex-wrap: wrap;
-    }
-
-    .btn-submit-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);
-      color: #FFFFFF;
-      border: none;
-      padding: 11px 24px;
-      border-radius: var(--radius-md);
-      font-family: var(--sans-font);
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
-      transition: all 0.2s ease;
-    }
-    [data-theme="dark"] .btn-submit-primary {
-      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-    }
-
-    .btn-submit-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(30, 64, 175, 0.35);
-    }
-
-    .btn-submit-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .kbd-shortcut {
-      font-family: var(--mono-font);
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    .btn-reset-secondary {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 9px 16px;
-      border-radius: var(--radius-md);
-      font-family: var(--sans-font);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-reset-secondary:hover {
-      background: var(--bg-subtle);
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-    }
-
-    /* RIGHT COLUMN: INTELLIGENCE & CREDIT MEMORANDUM */
-    .memo-card {
-      position: sticky;
-      top: 20px;
-    }
-
-    .memo-idle-state {
-      text-align: center;
-      padding: 44px 24px;
-    }
-
-    .idle-icon-wrap {
-      width: 64px;
-      height: 64px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
+    .section-number {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      margin: 0 auto 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-    }
-
-    .memo-idle-state h3 {
-      font-size: 15px;
+      background-color: #dbeafe;
+      color: #1d4ed8;
       font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-      font-family: var(--sans-font);
-    }
-
-    .memo-idle-state p {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      max-width: 40ch;
-      margin: 0 auto 20px;
-    }
-
-    .idle-checklist {
-      text-align: left;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .idle-checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ACTIVE CREDIT MEMORANDUM */
-    .memo-active {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .memo-explainer-banner {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      font-size: 11.5px;
-      color: var(--text-secondary);
-      line-height: 1.45;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .memo-explainer-banner strong {
-      color: var(--text-primary);
-    }
-
-    .memo-top-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-strong);
-      transition: all 0.3s ease;
-    }
-
-    .memo-top-banner.STANDBY {
-      background: var(--bg-subtle);
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-    }
-    .memo-top-banner.LOW {
-      background: var(--safe-bg);
-      border-color: var(--safe-border);
-      color: var(--safe-text);
-    }
-    .memo-top-banner.MEDIUM {
-      background: var(--caution-bg);
-      border-color: var(--caution-border);
-      color: var(--caution-text);
-    }
-    .memo-top-banner.HIGH {
-      background: var(--danger-bg);
-      border-color: var(--danger-border);
-      color: var(--danger-text);
-    }
-
-    .risk-grade-badge {
-      font-family: var(--sans-font);
       font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .badge-indicator-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-    .STANDBY .badge-indicator-dot { background: var(--text-muted); box-shadow: 0 0 0 3px var(--border-subtle); }
-    .LOW .badge-indicator-dot { background: var(--safe); box-shadow: 0 0 0 3px var(--safe-border); }
-    .MEDIUM .badge-indicator-dot { background: var(--caution); box-shadow: 0 0 0 3px var(--caution-border); }
-    .HIGH .badge-indicator-dot { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-border); }
-
-    .memo-dossier-id {
-      font-family: var(--mono-font);
-      font-size: 11px;
-      font-weight: 600;
-      opacity: 0.85;
-    }
-
-    /* SVG SPEEDOMETER HUD */
-    .gauge-hud-container {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 16px 14px;
-      display: grid;
-      grid-template-columns: 190px 1fr;
-      align-items: center;
-      gap: 16px;
-    }
-
-    @media (max-width: 520px) {
-      .gauge-hud-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-    }
-
-    .gauge-svg-wrap {
-      text-align: center;
-      position: relative;
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
 
-    .speedometer-svg {
-      width: 100%;
-      max-width: 185px;
-      overflow: visible;
+    .section-title {
+      font-size: 16.5px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
     }
 
-    .gauge-needle-group {
-      transform-origin: 100px 105px;
-      transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .gauge-center-stat {
-      margin-top: -6px;
-      font-family: var(--mono-font);
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
-
-    .gauge-center-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .gauge-tier-pill {
-      display: inline-block;
-      font-size: 10.5px;
-      font-weight: 700;
-      font-family: var(--sans-font);
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-top: 4px;
-      border: 1px solid var(--border-strong);
-      background: var(--surface);
-      color: var(--text-primary);
-    }
-    .gauge-tier-pill.safe {
-      background: var(--safe-bg);
-      border-color: var(--safe-border);
-      color: var(--safe-text);
-    }
-    .gauge-tier-pill.caution {
-      background: var(--caution-bg);
-      border-color: var(--caution-border);
-      color: var(--caution-text);
-    }
-    .gauge-tier-pill.danger {
-      background: var(--danger-bg);
-      border-color: var(--danger-border);
-      color: var(--danger-text);
-    }
-
-    .prob-matrix {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .prob-row {
-      display: grid;
-      grid-template-columns: 85px 1fr 45px;
-      align-items: center;
-      gap: 8px;
-      font-size: 11.5px;
-    }
-
-    .prob-tier-name {
-      font-family: var(--sans-font);
-      font-weight: 700;
-    }
-    .prob-row.LOW .prob-tier-name { color: var(--safe); }
-    .prob-row.MEDIUM .prob-tier-name { color: var(--caution); }
-    .prob-row.HIGH .prob-tier-name { color: var(--danger); }
-
-    .prob-bar-rail {
-      height: 8px;
-      background: var(--border-subtle);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .prob-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .prob-row.LOW .prob-bar-fill { background: var(--safe); }
-    .prob-row.MEDIUM .prob-bar-fill { background: var(--caution); }
-    .prob-row.HIGH .prob-bar-fill { background: var(--danger); }
-
-    .prob-percent {
-      font-family: var(--mono-font);
-      font-weight: 700;
-      text-align: right;
-      color: var(--text-primary);
-    }
-
-    /* RISK DRIVERS */
-    .drivers-block {
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
-    }
-
-    .block-heading {
-      font-family: var(--sans-font);
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .drivers-tag-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .driver-tag-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
+    /* Input & Labels */
+    .form-label {
+      font-size: 13px;
       font-weight: 500;
-      border: 1px solid;
+      color: #334155;
+      margin-bottom: 5px;
     }
 
-    .driver-tag-row.positive {
-      background: var(--safe-bg);
-      border-color: var(--safe-border);
-      color: var(--safe-text);
-    }
-    .driver-tag-row.warning {
-      background: var(--caution-bg);
-      border-color: var(--caution-border);
-      color: var(--caution-text);
-    }
-    .driver-tag-row.negative {
-      background: var(--danger-bg);
-      border-color: var(--danger-border);
-      color: var(--danger-text);
-    }
-    .driver-tag-row.neutral {
-      background: var(--bg-subtle);
-      border-color: var(--border-strong);
-      color: var(--text-primary);
+    .req-star {
+      color: #ef4444;
+      font-weight: 600;
     }
 
-    .recommendation-card {
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .rec-symbol {
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-    }
-    .LOW .rec-symbol { color: var(--safe); }
-    .MEDIUM .rec-symbol { color: var(--caution); }
-    .HIGH .rec-symbol { color: var(--danger); }
-
-    .rec-body h4 {
-      font-family: var(--sans-font);
+    .form-control, .form-select {
       font-size: 13.5px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 3px;
+      border-color: #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #1e293b;
     }
 
-    .rec-body p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.45;
+    .form-control::placeholder {
+      color: #94a3b8;
     }
 
-    .memo-actions-strip {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    .form-control:focus, .form-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
-    .memo-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-subtle);
-      background: var(--surface);
-      color: var(--text-primary);
-      font-family: var(--sans-font);
-      font-size: 12.5px;
+    .field-hint {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    /* Buttons */
+    .btn-predict {
+      background-color: #0066ff;
+      color: #ffffff;
+      border: none;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
+      font-size: 14px;
+      padding: 9px 24px;
+      border-radius: 8px;
+      transition: background-color 0.15s ease-in-out;
     }
 
-    .memo-btn:hover {
-      background: var(--bg-subtle);
-      border-color: var(--border-strong);
+    .btn-predict:hover {
+      background-color: #0052cc;
+      color: #ffffff;
     }
 
-    /* BATCH WORKBENCH & FILTER BAR */
-    .batch-workbench {
-      display: none;
+    .btn-clear {
+      background-color: #ffffff;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      transition: all 0.15s ease-in-out;
     }
 
-    .batch-drop-card {
-      border: 2px dashed var(--border-strong);
-      background: var(--surface);
-      border-radius: var(--radius-xl);
-      padding: 36px 24px;
+    .btn-clear:hover {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      border-color: #94a3b8;
+    }
+
+    .actions-note {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* Result styling */
+    .result-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .risk-badge-low {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .risk-badge-medium {
+      background-color: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .risk-badge-high {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .metric-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
       text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-bottom: 20px;
     }
 
-    .batch-drop-card:hover, .batch-drop-card.dragover {
-      border-color: var(--brand-accent);
-      background: var(--brand-accent-subtle);
-    }
-
-    .drop-icon-large {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px;
-      color: var(--brand-accent);
-    }
-
-    .batch-kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .batch-kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .kpi-card {
-      background: var(--surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
-    }
-
-    .kpi-title {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
+    .metric-label {
+      font-size: 11.5px;
+      color: #64748b;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-      font-family: var(--sans-font);
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
-    .kpi-val {
-      font-family: var(--mono-font);
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text-primary);
+    .metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 2px;
     }
 
-    .batch-table-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+    .prob-bar-container {
       margin-bottom: 12px;
     }
 
-    .table-filter-group {
+    .prob-bar-label {
       display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-family: var(--sans-font);
-      font-size: 11.5px;
-      font-weight: 600;
-      border: 1px solid var(--border-subtle);
-      background: var(--surface);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .filter-btn.active {
-      background: var(--brand-primary);
-      color: #FFFFFF;
-      border-color: var(--brand-primary);
-    }
-    [data-theme="dark"] .filter-btn.active {
-      background: var(--brand-accent);
-      color: #090D16;
-      border-color: var(--brand-accent);
-    }
-
-    .table-search-input {
-      height: 32px;
-      padding: 0 10px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-strong);
-      background: var(--surface);
-      color: var(--text-primary);
-      font-family: var(--sans-font);
-      font-size: 12px;
-      width: 220px;
-    }
-    .table-search-input:focus {
-      outline: none;
-      border-color: var(--border-focus);
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      background: var(--surface);
-      max-height: 480px;
-      overflow-y: auto;
-    }
-
-    .fin-table {
-      width: 100%;
-      border-collapse: collapse;
+      justify-content: space-between;
       font-size: 12.5px;
-      text-align: left;
+      font-weight: 500;
+      margin-bottom: 4px;
     }
 
-    .fin-table th {
-      background: var(--bg-subtle);
-      color: var(--text-secondary);
-      font-family: var(--sans-font);
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    .fin-table td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-    }
-
-    .fin-table tr:hover td {
-      background: var(--surface-hover);
-    }
-
-    /* MODAL / DRAWER SYSTEM */
-    .drawer-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .drawer-dialog {
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-xl);
-      max-width: 650px;
-      width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: var(--card-shadow-elevated);
-      animation: modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modal-pop {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .drawer-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .drawer-header h3 {
-      font-family: var(--sans-font);
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .btn-close-modal {
-      background: transparent;
-      border: none;
-      font-size: 20px;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px 8px;
+    .progress {
+      height: 8px;
       border-radius: 4px;
-    }
-    .btn-close-modal:hover { color: var(--text-primary); background: var(--bg-subtle); }
-
-    .drawer-body {
-      padding: 20px;
+      background-color: #e2e8f0;
     }
 
-    .code-console {
-      background: #090D16;
-      border: 1px solid #1F293D;
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-      position: relative;
-      margin: 12px 0;
-    }
-
-    .code-console pre {
-      font-family: var(--mono-font);
-      font-size: 12px;
-      color: #38BDF8;
-      overflow-x: auto;
-      line-height: 1.45;
-    }
-
-    .copy-code-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-family: var(--sans-font);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .copy-code-btn:hover { background: rgba(255, 255, 255, 0.2); }
-
-    .history-card-item {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-
-    .history-card-info strong {
-      font-family: var(--mono-font);
+    .driver-item {
       font-size: 13px;
-      color: var(--text-primary);
-      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
     }
 
-    .history-card-info span {
-      color: var(--text-muted);
+    .driver-positive {
+      background-color: #f0fdf4;
+      color: #166534;
+      border-left: 3px solid #22c55e;
     }
 
-    .history-actions {
+    .driver-warning {
+      background-color: #fffbeb;
+      color: #92400e;
+      border-left: 3px solid #f59e0b;
+    }
+
+    .driver-negative {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-left: 3px solid #ef4444;
+    }
+
+    .driver-neutral {
+      background-color: #f8fafc;
+      color: #475569;
+      border-left: 3px solid #94a3b8;
+    }
+
+    .footer-text {
+      text-align: center;
+      font-size: 12.5px;
+      color: #94a3b8;
+      margin-top: 36px;
+    }
+
+    .nav-tabs-container {
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .error-alert-banner {
-      background: var(--danger-bg);
-      border: 1px solid var(--danger-border);
-      color: var(--danger-text);
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
       gap: 10px;
+      margin-bottom: 18px;
     }
 
-    /* ========================================================= */
-    /* DEDICATED INSTITUTIONAL PRINT CREDIT MEMO STYLING        */
-    /* ========================================================= */
-    .print-only-memo {
-      display: none;
+    .nav-tab-btn {
+      background: none;
+      border: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #64748b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
-    @media print {
-      @page {
-        margin: 12mm 15mm 15mm;
-        size: A4 portrait;
-      }
-
-      body {
-        background: #FFFFFF !important;
-        color: #0F172A !important;
-        font-family: 'Hind Siliguri', 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-        font-size: 11pt !important;
-        line-height: 1.4 !important;
-        background-image: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-
-      .terminal-shell, .drawer-overlay {
-        display: none !important;
-      }
-
-      .print-only-memo {
-        display: block !important;
-        width: 100% !important;
-        color: #0F172A !important;
-      }
-
-      .p-memo-confidential {
-        font-family: 'Plus Jakarta Sans', monospace;
-        font-size: 8pt;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #64748B;
-        border-bottom: 1.5pt solid #0F172A;
-        padding-bottom: 4px;
-        margin-bottom: 14px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .p-memo-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 1pt solid #CBD5E1;
-      }
-
-      .p-memo-title h1 {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 16pt;
-        font-weight: 800;
-        color: #0F172A;
-        margin: 0 0 3px;
-        letter-spacing: -0.02em;
-      }
-
-      .p-memo-title p {
-        font-size: 10.5pt;
-        color: #475569;
-        margin: 0;
-      }
-
-      .p-memo-ref-box {
-        text-align: right;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 9pt;
-        line-height: 1.4;
-        color: #334155;
-      }
-
-      .p-memo-decision-banner {
-        border: 1.5pt solid #0F172A;
-        padding: 10px 14px;
-        border-radius: 6px;
-        margin-bottom: 18px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #F8FAFC !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .p-decision-main {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 13pt;
-        font-weight: 800;
-      }
-
-      .p-decision-grade {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11pt;
-        font-weight: 700;
-      }
-
-      .p-section-heading {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 10pt;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #0F172A;
-        border-bottom: 1pt solid #0F172A;
-        padding-bottom: 3px;
-        margin: 14px 0 8px;
-      }
-
-      .p-grid-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 12px;
-        font-size: 9.5pt;
-      }
-
-      .p-grid-table td, .p-grid-table th {
-        padding: 5px 8px;
-        border: 0.75pt solid #CBD5E1;
-        vertical-align: middle;
-      }
-
-      .p-grid-table th {
-        background: #F1F5F9 !important;
-        font-weight: 700;
-        color: #1E293B;
-        text-align: left;
-        width: 25%;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .p-grid-table td {
-        color: #0F172A;
-        width: 25%;
-      }
-
-      .p-grid-table .p-num {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 600;
-      }
-
-      .p-drivers-list {
-        margin: 6px 0 12px 18px;
-        font-size: 9.5pt;
-        line-height: 1.5;
-      }
-
-      .p-drivers-list li {
-        margin-bottom: 3px;
-      }
-
-      .p-rec-box {
-        border: 1pt solid #94A3B8;
-        background: #F8FAFC !important;
-        padding: 10px 14px;
-        border-radius: 4px;
-        margin-bottom: 22px;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .p-rec-box h4 {
-        font-size: 10.5pt;
-        font-weight: 700;
-        margin: 0 0 4px;
-      }
-
-      .p-rec-box p {
-        font-size: 9.5pt;
-        margin: 0;
-        color: #334155;
-      }
-
-      .p-signature-strip {
-        margin-top: 35px;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 20px;
-        page-break-inside: avoid;
-      }
-
-      .p-sig-box {
-        border-top: 1pt solid #475569;
-        padding-top: 6px;
-        text-align: center;
-        font-size: 8.5pt;
-        color: #475569;
-      }
-
-      .p-sig-box strong {
-        display: block;
-        color: #0F172A;
-        font-size: 9.5pt;
-      }
+    .nav-tab-btn.active {
+      background-color: #e2e8f0;
+      color: #1e293b;
     }
   </style>
 </head>
 <body>
 
-  <!-- SCREEN APP TERMINAL -->
-  <div class="terminal-shell">
+  <!-- Top Blue Bar -->
+  <header class="top-navbar">
+    <div class="container-fluid d-flex justify-content-between align-items-center" style="max-width: 800px; padding: 0;">
+      <span>SME Risk Detector</span>
+      <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleBatchModal()" style="font-size: 12px; border-radius: 6px;">
+        CSV Batch Upload
+      </button>
+    </div>
+  </header>
 
-    <!-- INSTITUTIONAL TOP BAR -->
-    <header class="top-header">
-      <div class="brand-section">
-        <div class="brand-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <path d="M9 12l2 2 4-4"></path>
-          </svg>
-        </div>
-        <div class="brand-title-group">
-          <h1>
-            SME RISK DETECTION & INTELLIGENCE
-            <span class="version-pill">RF-PRO v1.2</span>
-          </h1>
-          <div class="brand-subtitle">Automated Underwriting & Credit Risk Platform — বাংলাদেশ ব্যাংক ক্রেডিট গাইডলাইন সংবলিত</div>
-        </div>
+  <main class="main-container">
+
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h1 class="page-title">SME Applicant Details</h1>
+        <p class="page-subtitle">Fill in the business profile and financing info to predict risk.</p>
       </div>
-
-      <!-- Telemetry Chip -->
-      <div class="telemetry-bar">
-        <div class="telemetry-item">
-          <span class="status-dot"></span>
-          <span>Engine Active — সক্রিয় ইঞ্জিন</span>
-        </div>
-        <div class="telemetry-item">
-          <span>Latency — লেটেন্সি: <strong class="num">&lt;10ms</strong></span>
-        </div>
-        <div class="telemetry-item">
-          <span>Accuracy — নির্ভুলতা: <strong class="num">86.2%</strong></span>
-        </div>
-      </div>
-
-      <!-- Controls -->
-      <div class="header-controls">
-        <button class="header-btn" id="btn-api-docs" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-          API Docs — এপিআই ডক
-        </button>
-        <button class="header-btn" id="btn-history" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          Audit Archive — অডিট হিস্ট্রি
-        </button>
-        <button class="header-btn theme-toggle-btn" id="theme-toggle" type="button" aria-label="Theme Toggle — থিম পরিবর্তন">
-          <span class="sun-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          </span>
-          <span class="moon-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          </span>
-          <span id="theme-label">Theme — থিম</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- WORKSPACE SUB-NAV -->
-    <div class="workspace-nav">
-      <!-- Segmented View Tabs -->
-      <div class="view-segmented-control">
-        <button class="seg-btn active" id="tab-single" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-          Single Appraisal — একক আন্ডাররাইটিং
-        </button>
-        <button class="seg-btn" id="tab-batch" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-          Batch CSV Audit — পোর্টফোলিও ব্যাচ নিরীক্ষা
-        </button>
-      </div>
-
-      <!-- Quick Archetype Selector -->
-      <div class="quick-preset-deck" id="preset-container">
-        <span class="preset-label">Quick Presets — টেস্ট প্রোফাইল:</span>
-        <button type="button" class="preset-chip prime" onclick="loadPreset('low')">
-          <span class="preset-icon-badge safe">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </span>
-          Prime Exporter — টেক্সটাইল রপ্তানিকারক (Low Risk)
-        </button>
-        <button type="button" class="preset-chip moderate" onclick="loadPreset('medium')">
-          <span class="preset-icon-badge caution">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-          </span>
-          Agri Processing — কৃষি প্রক্রিয়াজাত (Moderate)
-        </button>
-        <button type="button" class="preset-chip subprime" onclick="loadPreset('high')">
-          <span class="preset-icon-badge danger">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-          </span>
-          Retail Startup — নতুন রিটেল শপ (High Risk)
-        </button>
-        <button type="button" class="preset-chip" onclick="resetForm()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
-          Reset — রিসেট
-        </button>
+      <div>
+        {% if result %}
+        <span class="step-badge" style="background-color: #dcfce7; color: #15803d;">
+          Step 2 of 2 • Assessment Result
+        </span>
+        {% else %}
+        <span class="step-badge">
+          Step 1 of 2 • Input
+        </span>
+        {% endif %}
       </div>
     </div>
 
+    <!-- Error Alert -->
     {% if error %}
-    <div class="error-alert-banner">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      <div><strong>Input Error — ইনপুট ত্রুটি:</strong> {{ error }}</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; font-size: 13.5px;">
+      <strong>Error:</strong> {{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endif %}
 
-    <!-- VIEW 1: SINGLE UNDERWRITING ASSESSMENT -->
-    <div id="view-single">
-      <div class="workspace-grid">
-
-        <!-- LEFT PANEL: UNDERWRITING INPUT CONSOLE -->
-        <div class="panel-card">
-          <div class="panel-card-header">
-            <div class="panel-title-wrap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              <h2>Underwriting Input Console — আন্ডাররাইটিং ইনপুট কনসোল</h2>
-            </div>
-            <span class="panel-badge">12 Parameters — ১২টি প্যারামিটার</span>
-          </div>
-
-          <div class="panel-card-body">
-            <form method="POST" action="/predict" id="risk-form">
-
-              <!-- SECTION 1: BUSINESS PROFILE -->
-              <div class="form-section">
-                <div class="section-legend">
-                  <span class="section-legend-num">01</span>
-                  <span>Enterprise Profile & Tenure — ব্যবসায়িক প্রোফাইল ও পরিচিতি</span>
-                </div>
-                <div class="fields-grid-2">
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Business Age</span>
-                      <span>ব্যবসায়ের বয়স (বছর)</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="1" min="0" name="business_age_years" id="inp_business_age" required value="{{ form_data.business_age_years if form_data else '' }}" placeholder="e.g. 8">
-                    </div>
-                    <div class="input-micro-hint">Enterprise Tenure (Years) — প্রতিষ্ঠার সময়কাল</div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Owner Experience</span>
-                      <span>মালিকের অভিজ্ঞতা (বছর)</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="1" min="0" name="owner_experience_years" id="inp_owner_exp" required value="{{ form_data.owner_experience_years if form_data else '' }}" placeholder="e.g. 10">
-                    </div>
-                    <div class="input-micro-hint">Trade Experience (Years) — সংশ্লিষ্ট ট্রেড অভিজ্ঞতা</div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Banking Relationship</span>
-                      <span>ব্যাংকিং সম্পর্ক (বছর)</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="1" min="0" name="banking_years" id="inp_banking_years" required value="{{ form_data.banking_years if form_data else '' }}" placeholder="e.g. 5">
-                    </div>
-                    <div class="input-micro-hint">Account Age (Years) — অ্যাকাউন্টের বয়সকাল</div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Employee Headcount</span>
-                      <span>মোট কর্মচারী সংখ্যা</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="1" min="0" name="num_employees" id="inp_employees" required value="{{ form_data.num_employees if form_data else '' }}" placeholder="e.g. 15">
-                    </div>
-                    <div class="input-micro-hint">Total Workforce — মোট পূর্ণকালীন কর্মী</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECTION 2: FINANCIAL LEVERAGE & COLLATERAL -->
-              <div class="form-section">
-                <div class="section-legend">
-                  <span class="section-legend-num">02</span>
-                  <span>Financial Capacity & Leverage — আর্থিক সক্ষমতা ও লিভারেজ</span>
-                </div>
-                <div class="fields-grid-2">
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Annual Revenue</span>
-                      <span>বার্ষিক টার্নওভার / আয়</span>
-                    </label>
-                    <div class="input-wrapper has-prefix">
-                      <span class="prefix">৳</span>
-                      <input type="number" step="any" min="0" name="annual_revenue" id="inp_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}" placeholder="e.g. 6500000">
-                    </div>
-                    <div class="input-micro-hint">
-                      <span id="hint_revenue">Enter Turnover (BDT) — টাকার পরিমাণ লিখুন</span>
-                    </div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Requested Loan Amount</span>
-                      <span>আবেদিত ঋণের পরিমাণ</span>
-                    </label>
-                    <div class="input-wrapper has-prefix">
-                      <span class="prefix">৳</span>
-                      <input type="number" step="any" min="0" name="loan_amount" id="inp_loan" required value="{{ form_data.loan_amount if form_data else '' }}" placeholder="e.g. 2000000">
-                    </div>
-                    <div class="input-micro-hint">
-                      <span id="hint_loan">Requested Facility (BDT) — ঋণের পরিমাণ</span>
-                    </div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Debt-to-Asset Ratio</span>
-                      <span>ঋণ-সম্পদ অনুপাত</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="any" min="0" max="2" name="debt_to_asset_ratio" id="inp_debt_asset" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}" placeholder="e.g. 0.35">
-                    </div>
-                    <div class="input-micro-hint">Benchmark: &lt; 0.50 — আদর্শ মান: &lt; ০.৫০ (e.g. 0.35)</div>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Collateral Value</span>
-                      <span>জামানতের মূল্য</span>
-                    </label>
-                    <div class="input-wrapper has-prefix">
-                      <span class="prefix">৳</span>
-                      <input type="number" step="any" min="0" name="collateral_value" id="inp_collateral" required value="{{ form_data.collateral_value if form_data else '' }}" placeholder="e.g. 3000000">
-                    </div>
-                    <div class="input-micro-hint">
-                      <span id="hint_collateral">Immovable Collateral (0 if None) — স্থাবর জামানত (না থাকলে ০)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="fields-grid-2" style="margin-top: 14px;">
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Past Defaults</span>
-                      <span>অতীত খেলাপি রেকর্ড</span>
-                    </label>
-                    <div class="input-wrapper">
-                      <input type="number" step="1" min="0" name="past_defaults" id="inp_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
-                    </div>
-                    <div class="input-micro-hint">CIB Track Record — CIB খেলাপির সংখ্যা</div>
-                  </div>
-                </div>
-
-                <!-- Live Dynamic Micro-Indicators -->
-                <div class="ratio-strip">
-                  <div class="ratio-metric">
-                    <span class="ratio-label">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                      <strong>Collateral Coverage (LTV) — জামানত কভারেজ:</strong>
-                    </span>
-                    <span class="ratio-val-tag" id="live-collateral-cov">0.0%</span>
-                  </div>
-                  <div class="ratio-metric">
-                    <span class="ratio-label">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line><line x1="12" y1="20" x2="12" y2="9"></line></svg>
-                      <strong>Loan-to-Revenue — লোন-টু-টার্নওভার:</strong>
-                    </span>
-                    <span class="ratio-val-tag" id="live-loan-rev">0.0%</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECTION 3: SECTOR & LOCATION -->
-              <div class="form-section">
-                <div class="section-legend">
-                  <span class="section-legend-num">03</span>
-                  <span>Sector & Demographics — ভৌগোলিক অবস্থান ও শিল্প খাত</span>
-                </div>
-                <div class="fields-grid-3">
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">District</span>
-                      <span>জেলা</span>
-                    </label>
-                    <select name="district" id="inp_district" required>
-                      {% for d in districts %}
-                      <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Location Type</span>
-                      <span>অবস্থানের ধরন</span>
-                    </label>
-                    <select name="location_type" id="inp_location" required>
-                      {% for lt in location_types %}
-                      <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-
-                  <div class="input-control">
-                    <label>
-                      <span class="en-tag">Business Sector</span>
-                      <span>ব্যবসার খাত</span>
-                    </label>
-                    <select name="sector" id="inp_sector" required>
-                      {% for s in sectors %}
-                      <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <!-- FORM ACTION DECK (Centered) -->
-              <div class="form-action-bar">
-                <button type="button" class="btn-reset-secondary" onclick="resetForm()">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
-                  Reset — রিসেট
-                </button>
-                <button type="submit" class="btn-submit-primary" id="submit-btn">
-                  <span id="btn-text">Run Risk Appraisal & Generate Memo — ঝুঁকি বিশ্লেষণ ও ক্রেডিট মেমো তৈরি করুন</span>
-                  <span class="kbd-shortcut">Ctrl + ↵</span>
-                </button>
-              </div>
-            </form>
-          </div>
+    <!-- RESULTS SECTION (Displayed if prediction is performed) -->
+    {% if result %}
+    <div class="result-card mb-4" id="assessmentResult">
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+          <h5 class="mb-0 fw-bold text-dark">Credit Risk Assessment Report</h5>
+          <small class="text-muted">Analysis complete based on financial & credit metrics</small>
         </div>
-
-        <!-- RIGHT PANEL: CREDIT INTELLIGENCE MEMO -->
-        <div class="panel-card memo-card" id="memo-board">
-          <div class="panel-card-header">
-            <div class="panel-title-wrap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              <h2>Credit Intelligence Memorandum — ক্রেডিট ইন্টেলিজেন্স মেমোরেন্ডাম</h2>
-            </div>
-            <span class="panel-badge num" id="memo-top-badge">OFFICIAL DOSSIER</span>
-          </div>
-
-          <div class="panel-card-body">
-            <!-- ACTIVE EVALUATION REPORT (ALWAYS VISIBLE & ANIMATED) -->
-            <div class="memo-active" id="prediction-result-box">
-              
-              <!-- Explainer Banner: Clarifies purpose of Memorandum -->
-              <div class="memo-explainer-banner">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" stroke-width="2.2" style="flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <div>
-                  <strong>AI Credit Underwriting & Risk Dossier:</strong> Real-time assessment of 12 enterprise metrics with calibrated risk scoring, probability distribution, and Bangladesh Bank sanction recommendations.
-                </div>
-              </div>
-
-              <!-- Decision Status Banner -->
-              <div class="memo-top-banner {{ result.risk_level if result else 'STANDBY' }}" id="memo-status-banner">
-                <div>
-                  <div class="risk-grade-badge" id="memo-grade-badge">
-                    <span class="badge-indicator-dot"></span>
-                    <span id="memo-grade-text">
-                      {% if result %}
-                        {% if result.risk_level == 'LOW' %}
-                        LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Prime Status)
-                        {% elif result.risk_level == 'MEDIUM' %}
-                        MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)
-                        {% else %}
-                        HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)
-                        {% endif %}
-                      {% else %}
-                        STANDBY — টেস্ট প্রোফাইল বা ইনপুট দিন
-                      {% endif %}
-                    </span>
-                  </div>
-                  <div style="font-size:12px; margin-top:2px; opacity:0.9;" id="memo-rating-subtext">
-                    Credit Risk Rating — ক্রেডিট রেটিং: <strong id="memo-rating-grade">{{ 'GRADE A (Prime)' if result and result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result and result.risk_level == 'MEDIUM' else ('GRADE C (Subprime)' if result else 'READY')) }}</strong>
-                  </div>
-                </div>
-                <div style="text-align:right;">
-                  <div class="memo-dossier-id" id="memo-dossier-tag">DOSSIER #{{ range(1000, 9999)|random }}</div>
-                  <div class="num" style="font-size:11px; opacity:0.8;" id="memo-score-pill">{{ result.insights.risk_score if result and result.insights else '0.0' }}/100</div>
-                </div>
-              </div>
-
-              <!-- SPEEDOMETER HUD + MULTI-CLASS CONFIDENCE MATRIX -->
-              <div class="gauge-hud-container" id="gauge-hud">
-                <div class="gauge-svg-wrap">
-                  <svg class="speedometer-svg" viewBox="0 0 200 120">
-                    <defs>
-                      <filter id="needle-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/>
-                      </filter>
-                    </defs>
-
-                    <!-- Background Base Arc -->
-                    <path d="M 25 105 A 75 75 0 0 1 175 105" fill="none" stroke="var(--border-strong)" stroke-width="12" stroke-linecap="round" />
-                    
-                    <!-- Safe Zone (0% - 35%): Green -->
-                    <path d="M 25 105 A 75 75 0 0 1 66 38.1" fill="none" stroke="var(--safe)" stroke-width="12" stroke-linecap="round" />
-                    
-                    <!-- Caution Zone (35% - 70%): Amber -->
-                    <path d="M 66 38.1 A 75 75 0 0 1 144.1 44.3" fill="none" stroke="var(--caution)" stroke-width="12" />
-                    
-                    <!-- Danger Zone (70% - 100%): Red -->
-                    <path d="M 144.1 44.3 A 75 75 0 0 1 175 105" fill="none" stroke="var(--danger)" stroke-width="12" stroke-linecap="round" />
-
-                    <!-- Zone Labels & Numbers -->
-                    <text x="22" y="118" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--safe)" text-anchor="middle">0%</text>
-                    <text x="56" y="24" font-size="8.5" font-family="var(--sans-font)" font-weight="700" fill="var(--safe)" text-anchor="middle">SAFE</text>
-                    <text x="100" y="16" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--caution)" text-anchor="middle">50%</text>
-                    <text x="144" y="24" font-size="8.5" font-family="var(--sans-font)" font-weight="700" fill="var(--danger)" text-anchor="middle">DANGER</text>
-                    <text x="178" y="118" font-size="9" font-family="var(--mono-font)" font-weight="700" fill="var(--danger)" text-anchor="middle">100%</text>
-
-                    <!-- Interactive Needle -->
-                    {% set score = result.insights.risk_score if result and result.insights else 0 %}
-                    {% set angle = (score / 100 * 180) - 90 %}
-                    <g id="gauge-needle" class="gauge-needle-group" transform="rotate({{ angle }} 100 105)" filter="url(#needle-shadow)">
-                      <polygon points="97,105 100,32 103,105" fill="var(--text-primary)" />
-                      <circle cx="100" cy="105" r="7" fill="var(--text-primary)" />
-                      <circle cx="100" cy="105" r="3" fill="var(--surface)" />
-                    </g>
-                  </svg>
-                  
-                  <div class="gauge-center-stat" id="gauge-center-stat"><span id="gauge-score-val">{{ score }}</span>%</div>
-                  <div class="gauge-center-label">Risk Index — রিস্ক ইনডেক্স</div>
-                  <div id="gauge-tier-pill" class="gauge-tier-pill {{ 'safe' if score < 35 and result else ('caution' if score < 70 and result else ('danger' if result else '')) }}">
-                    <span id="gauge-tier-label">{{ 'SAFE (Prime)' if score < 35 and result else ('WATCH (Moderate)' if score < 70 and result else ('CRITICAL (Subprime)' if result else 'READY TO ASSESS')) }}</span>
-                  </div>
-                </div>
-
-                <!-- Multi-class Probability Breakdown -->
-                <div class="prob-matrix">
-                  <div class="prob-row LOW">
-                    <span class="prob-tier-name">LOW RISK</span>
-                    <div class="prob-bar-rail">
-                      <div class="prob-bar-fill" id="prob-bar-low" style="width: {{ (result.probabilities.LOW * 100)|round(1) if result else 0 }}%;"></div>
-                    </div>
-                    <span class="prob-percent" id="prob-val-low">{{ (result.probabilities.LOW * 100)|round(1) if result else 0 }}%</span>
-                  </div>
-                  <div class="prob-row MEDIUM">
-                    <span class="prob-tier-name">MEDIUM</span>
-                    <div class="prob-bar-rail">
-                      <div class="prob-bar-fill" id="prob-bar-med" style="width: {{ (result.probabilities.MEDIUM * 100)|round(1) if result else 0 }}%;"></div>
-                    </div>
-                    <span class="prob-percent" id="prob-val-med">{{ (result.probabilities.MEDIUM * 100)|round(1) if result else 0 }}%</span>
-                  </div>
-                  <div class="prob-row HIGH">
-                    <span class="prob-tier-name">HIGH RISK</span>
-                    <div class="prob-bar-rail">
-                      <div class="prob-bar-fill" id="prob-bar-high" style="width: {{ (result.probabilities.HIGH * 100)|round(1) if result else 0 }}%;"></div>
-                    </div>
-                    <span class="prob-percent" id="prob-val-high">{{ (result.probabilities.HIGH * 100)|round(1) if result else 0 }}%</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- KEY RISK DRIVERS (XAI) -->
-              <div class="drivers-block">
-                <div class="block-heading">
-                  <span>Key Risk Drivers (XAI) — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</span>
-                  <span id="drivers-count-badge">{{ result.insights.drivers|length if result and result.insights and result.insights.drivers else 0 }} Factors — ফ্যাক্টর</span>
-                </div>
-                <div class="drivers-tag-list" id="drivers-list-container">
-                  {% if result and result.insights and result.insights.drivers %}
-                    {% for driver in result.insights.drivers %}
-                    <div class="driver-tag-row {{ driver.type }}">
-                      {% if driver.type == 'positive' %}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      {% elif driver.type == 'warning' %}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
-                      {% elif driver.type == 'negative' %}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                      {% else %}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                      {% endif %}
-                      <span>{{ driver.text }}</span>
-                    </div>
-                    {% endfor %}
-                  {% else %}
-                    <div class="driver-tag-row neutral">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                      <span>Awaiting appraisal input — টেস্ট প্রোফাইলে ক্লিক করুন অথবা তথ্য দিন</span>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <!-- RECOMMENDATION BOX -->
-              <div class="recommendation-card" id="recommendation-card">
-                <div class="rec-symbol" id="rec-symbol-box">
-                  {% if result %}
-                    {% if result.risk_level == 'LOW' %}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    {% elif result.risk_level == 'MEDIUM' %}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    {% else %}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
-                    {% endif %}
-                  {% else %}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                  {% endif %}
-                </div>
-                <div class="rec-body">
-                  <h4 id="rec-title">{{ result.insights.recommendation.title if result and result.insights and result.insights.recommendation else 'Underwriting Terms & Recommendation — ক্রেডিট সুপারিশ' }}</h4>
-                  <p id="rec-summary">{{ result.insights.recommendation.summary if result and result.insights and result.insights.recommendation else 'Fill in borrower inputs on the left console or select a Quick Preset above to generate automated credit sanction recommendations.' }}</p>
-                </div>
-              </div>
-
-              <!-- ACTIONS -->
-              <div class="memo-actions-strip">
-                <button type="button" class="memo-btn" onclick="executePrint()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                  Print Credit Memo — প্রিন্ট মেমো
-                </button>
-                <button type="button" class="memo-btn" onclick="saveToHistory()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                  Save to Archive — সংরক্ষণ
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- VIEW 2: PORTFOLIO BATCH CSV PROCESSING -->
-    <div id="view-batch" class="batch-workbench">
-      <div class="panel-card">
-        <div class="panel-card-header">
-          <div class="panel-title-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-            <h2>Portfolio Batch Underwriting Engine — পোর্টফোলিও ব্যাচ প্রসেসিং হাব</h2>
-          </div>
-          <a href="/sample_template_csv" class="header-btn" style="text-decoration:none;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Sample CSV Template — নমুনা CSV ডাউনলোড
-          </a>
-        </div>
-
-        <div class="panel-card-body">
-          <div class="batch-drop-card" id="csv-dropzone" onclick="document.getElementById('csv-file-input').click()">
-            <div class="drop-icon-large">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            </div>
-            <h3 style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
-              Upload / Drop CSV File — CSV ফাইল ড্রপ করুন অথবা ব্রাউজ করুন
-            </h3>
-            <p style="font-size:12px; color:var(--text-muted); margin:0;">
-              Upload SME portfolio data (.csv) to generate instant vectorized ML credit appraisal reports. — দ্রুত ফলাফল পেতে এসএমই পোর্টফোলিও ডেটা (.csv) আপলোড করুন।
-            </p>
-            <input type="file" id="csv-file-input" accept=".csv" style="display:none;" onchange="handleFileSelect(event)">
-          </div>
-
-          <div id="batch-status" style="display:none; text-align:center; padding:24px;">
-            <div style="font-size:13px; font-weight:600; color:var(--brand-accent);" id="batch-status-text">
-              Vectorized Inference in Progress — ফাইল প্রক্রিয়াকরণ চলছে...
-            </div>
-          </div>
-
-          <div id="batch-results-wrapper" style="display:none;">
-            <div class="batch-kpi-grid">
-              <div class="kpi-card">
-                <div class="kpi-title">Total Applications — মোট আবেদন</div>
-                <div class="kpi-val" id="kpi-total">0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-title">Low Risk (Prime) — লো রিস্ক</div>
-                <div class="kpi-val" style="color:var(--safe);" id="kpi-low">0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-title">Medium Risk (Watch) — মিডিয়াম রিস্ক</div>
-                <div class="kpi-val" style="color:var(--caution);" id="kpi-med">0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-title">High Risk (Critical) — হাই রিস্ক</div>
-                <div class="kpi-val" style="color:var(--danger);" id="kpi-high">0</div>
-              </div>
-            </div>
-
-            <!-- Table Filter & Search Toolbar -->
-            <div class="batch-table-toolbar">
-              <div class="table-filter-group">
-                <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Filter — ফিল্টার:</span>
-                <button type="button" class="filter-btn active" onclick="filterBatchTable('ALL')">All Records — সবগুলো (<span id="count-all">0</span>)</button>
-                <button type="button" class="filter-btn" onclick="filterBatchTable('LOW')">Low Risk — লো রিস্ক</button>
-                <button type="button" class="filter-btn" onclick="filterBatchTable('MEDIUM')">Medium Risk — মিডিয়াম রিস্ক</button>
-                <button type="button" class="filter-btn" onclick="filterBatchTable('HIGH')">High Risk — হাই রিস্ক</button>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <input type="text" class="table-search-input" id="batch-search-box" placeholder="Search District / Sector — খুঁজুন..." oninput="searchBatchTable()">
-                <button type="button" class="memo-btn" onclick="exportBatchResultsCSV()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Export CSV — এক্সপোর্ট
-                </button>
-              </div>
-            </div>
-
-            <div class="table-responsive">
-              <table class="fin-table" id="batch-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>District — জেলা</th>
-                    <th>Sector — শিল্প খাত</th>
-                    <th>Loan Amount — ঋণের পরিমাণ</th>
-                    <th>Turnover — বার্ষিক টার্নওভার</th>
-                    <th>Risk Level — ঝুঁকি স্তর</th>
-                    <th>Risk Score — স্কোর</th>
-                  </tr>
-                </thead>
-                <tbody id="batch-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- DEDICATED PRINTABLE CREDIT EVALUATION MEMO (Visible Only on Print) -->
-  <div id="printable-credit-memo" class="print-only-memo">
-    <div class="p-memo-confidential">
-      <span>CONFIDENTIAL & PROPRIETARY</span>
-      <span>BANGLADESH BANK SME CREDIT FRAMEWORK v2.4</span>
-      <span>INTERNAL CREDIT COMMITTEE USE ONLY</span>
-    </div>
-
-    <div class="p-memo-header">
-      <div class="p-memo-title">
-        <h1>SME CREDIT RISK APPRAISAL MEMORANDUM</h1>
-        <p>SME Credit Assessment & Underwriting Recommendations — ক্ষুদ্র ও মাঝারি উদ্যোক্তা ঋণ ঝুঁকি মূল্যায়ন ও সুপারিশনামা</p>
-      </div>
-      <div class="p-memo-ref-box">
-        <div><strong>MEMO REF:</strong> SME-CRD-<span id="p-memo-id">{{ range(1000, 9999)|random }}</span></div>
-        <div><strong>DATE:</strong> <span id="p-memo-date"></span></div>
-        <div><strong>MODEL:</strong> Random Forest v1.2</div>
-      </div>
-    </div>
-
-    <!-- Official Decision Banner -->
-    <div class="p-memo-decision-banner">
-      <div>
-        <div class="p-decision-main" id="p-decision-text">
-          {% if result %}
-            {% if result.risk_level == 'LOW' %}
-              [APPROVED] LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Standard Prime Terms)
-            {% elif result.risk_level == 'MEDIUM' %}
-              [CONDITIONAL] MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা ও বর্ধিত জামানত
-            {% else %}
-              [REJECT / HIGH RISK] SUBPRIME — সাবপ্রাইম ঝুঁকি ও উচ্চ খেলাপি সম্ভাবনা
-            {% endif %}
+        <div>
+          {% if result.risk_level == 'LOW' %}
+            <span class="badge risk-badge-low px-3 py-2 rounded-pill fs-6 fw-bold">LOW RISK</span>
+          {% elif result.risk_level == 'MEDIUM' %}
+            <span class="badge risk-badge-medium px-3 py-2 rounded-pill fs-6 fw-bold">MEDIUM RISK</span>
           {% else %}
-            [PROVISIONAL] Underwriting Review Pending — আন্ডাররাইটিং রিভিউ প্রক্রিয়াধীন
+            <span class="badge risk-badge-high px-3 py-2 rounded-pill fs-6 fw-bold">HIGH RISK</span>
           {% endif %}
         </div>
-        <div style="font-size:9pt; color:#475569; margin-top:2px;">
-          Credit Risk Rating — ক্রেডিট রেটিং: <strong id="p-decision-tier">
-            {% if result %}
-              {{ 'GRADE A (Prime)' if result.risk_level == 'LOW' else ('GRADE B (Moderate Watch)' if result.risk_level == 'MEDIUM' else 'GRADE C (Subprime)') }}
-            {% else %}
-              PENDING
-            {% endif %}
-          </strong>
+      </div>
+
+      <!-- Probability Bars -->
+      <div class="mb-4">
+        <h6 class="fw-semibold text-secondary mb-3" style="font-size: 13px;">PROBABILITY DISTRIBUTION</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="prob-bar-container">
+              <div class="prob-bar-label">
+                <span class="text-success fw-medium">Low Risk</span>
+                <span class="fw-bold">{{ (result.probabilities.LOW * 100)|round(1) }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-success" style="width: {{ result.probabilities.LOW * 100 }}%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="prob-bar-container">
+              <div class="prob-bar-label">
+                <span class="text-warning fw-medium" style="color: #d97706 !important;">Medium Risk</span>
+                <span class="fw-bold">{{ (result.probabilities.MEDIUM * 100)|round(1) }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-warning" style="width: {{ result.probabilities.MEDIUM * 100 }}%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="prob-bar-container">
+              <div class="prob-bar-label">
+                <span class="text-danger fw-medium">High Risk</span>
+                <span class="fw-bold">{{ (result.probabilities.HIGH * 100)|round(1) }}%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-danger" style="width: {{ result.probabilities.HIGH * 100 }}%"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="text-align:right;">
-        <div style="font-size:8.5pt; color:#64748B;">Overall Risk Score — সামগ্রিক স্কোর</div>
-        <div class="p-decision-grade" id="p-decision-score">
-          {{ result.insights.risk_score if result and result.insights else '0' }}%
+
+      <!-- Metrics Row -->
+      {% if result.insights %}
+      <div class="row g-2 mb-4">
+        <div class="col-md-3 col-6">
+          <div class="metric-box">
+            <div class="metric-label">Risk Score</div>
+            <div class="metric-value">{{ result.insights.risk_score }}/100</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="metric-box">
+            <div class="metric-label">Collateral (LTV)</div>
+            <div class="metric-value">{{ result.insights.collateral_coverage }}%</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="metric-box">
+            <div class="metric-label">Loan to Revenue</div>
+            <div class="metric-value">{{ result.insights.loan_to_revenue }}%</div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="metric-box">
+            <div class="metric-label">Debt-to-Asset</div>
+            <div class="metric-value">{{ form_data.debt_to_asset_ratio if form_data else '0' }}</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Section 1: Enterprise Profile -->
-    <div class="p-section-heading">1. Enterprise Profile — গ্রাহক ও প্রতিষ্ঠানের তথ্য</div>
-    <table class="p-grid-table">
-      <tr>
-        <th>Business Age — ব্যবসায়ের বয়স</th>
-        <td class="p-num" id="p-biz-age">{{ form_data.business_age_years if form_data else '-' }} Years</td>
-        <th>Owner Experience — ট্রেড অভিজ্ঞতা</th>
-        <td class="p-num" id="p-owner-exp">{{ form_data.owner_experience_years if form_data else '-' }} Years</td>
-      </tr>
-      <tr>
-        <th>Banking Relationship — ব্যাংকিং সম্পর্ক</th>
-        <td class="p-num" id="p-banking-age">{{ form_data.banking_years if form_data else '-' }} Years</td>
-        <th>Employee Headcount — মোট কর্মী</th>
-        <td class="p-num" id="p-employees">{{ form_data.num_employees if form_data else '-' }}</td>
-      </tr>
-      <tr>
-        <th>District & Location — জেলা ও অবস্থান</th>
-        <td id="p-location">{{ form_data.district if form_data else '-' }} ({{ form_data.location_type if form_data else '-' }})</td>
-        <th>Business Sector — শিল্প খাত</th>
-        <td id="p-sector">{{ form_data.sector if form_data else '-' }}</td>
-      </tr>
-    </table>
-
-    <!-- Section 2: Financial Metrics & Ratios -->
-    <div class="p-section-heading">2. Financial Exposure & Ratios — আর্থিক সক্ষমতা ও রিস্ক রেশিও</div>
-    <table class="p-grid-table">
-      <tr>
-        <th>Requested Loan — আবেদিত ঋণ</th>
-        <td class="p-num" id="p-loan-amount">৳ {{ form_data.loan_amount if form_data else '-' }}</td>
-        <th>Annual Turnover — বার্ষিক টার্নওভার</th>
-        <td class="p-num" id="p-revenue">৳ {{ form_data.annual_revenue if form_data else '-' }}</td>
-      </tr>
-      <tr>
-        <th>Collateral Value — জামানত</th>
-        <td class="p-num" id="p-collateral">৳ {{ form_data.collateral_value if form_data else '-' }}</td>
-        <th>Collateral Coverage (LTV) — জামানত কভারেজ</th>
-        <td class="p-num" id="p-col-cov">
-          {{ result.insights.collateral_coverage if result and result.insights else '-' }}%
-        </td>
-      </tr>
-      <tr>
-        <th>Debt-to-Asset (D/A) — ঋণ-সম্পদ অনুপাত</th>
-        <td class="p-num" id="p-debt-asset">{{ form_data.debt_to_asset_ratio if form_data else '-' }}</td>
-        <th>Loan-to-Turnover — লোন/টার্নওভার অনুপাত</th>
-        <td class="p-num" id="p-loan-rev">
-          {{ result.insights.loan_to_revenue if result and result.insights else '-' }}%
-        </td>
-      </tr>
-      <tr>
-        <th>Past Defaults — অতীত খেলাপি রেকর্ড</th>
-        <td class="p-num" id="p-defaults">{{ form_data.past_defaults if form_data else '0' }} Times</td>
-        <th>CIB Track Record — সিআইবি স্ট্যাটাস</th>
-        <td id="p-cib-status">
-          {{ 'Clean Record — অতীত খেলাপি মুক্ত' if not form_data or form_data.past_defaults == '0' or form_data.past_defaults == 0 else 'Default Record Exists — খেলাপি ইতিহাস বিদ্যমান' }}
-        </td>
-      </tr>
-    </table>
-
-    <!-- Section 3: Model Probability Matrix -->
-    <div class="p-section-heading">3. Statistical Probability Matrix — মডেল রিস্ক স্কোরকার্ড</div>
-    <table class="p-grid-table">
-      <tr>
-        <th>Low Risk Probability — লো রিস্ক সম্ভাবনা</th>
-        <td class="p-num" id="p-prob-low">
-          {{ (result.probabilities.LOW * 100)|round(1) if result else '-' }}%
-        </td>
-        <th>Medium Risk Probability — মিডিয়াম সম্ভাবনা</th>
-        <td class="p-num" id="p-prob-med">
-          {{ (result.probabilities.MEDIUM * 100)|round(1) if result else '-' }}%
-        </td>
-      </tr>
-      <tr>
-        <th>High Risk Probability — হাই রিস্ক সম্ভাবনা</th>
-        <td class="p-num" id="p-prob-high">
-          {{ (result.probabilities.HIGH * 100)|round(1) if result else '-' }}%
-        </td>
-        <th>Model Confidence — কনফিডেন্স লেভেল</th>
-        <td class="p-num">High / Ensemble Verified (86.2%)</td>
-      </tr>
-    </table>
-
-    <!-- Section 4: Key Risk Drivers -->
-    <div class="p-section-heading">4. Key Risk Drivers — ঝুঁকি নির্ধারক ফ্যাক্টরসমূহ</div>
-    <ul class="p-drivers-list" id="p-drivers-ul">
-      {% if result and result.insights and result.insights.drivers %}
-        {% for driver in result.insights.drivers %}
-        <li><strong>[{{ 'POSITIVE' if driver.type == 'positive' else ('WARNING' if driver.type == 'warning' else 'CRITICAL') }}]</strong> {{ driver.text }}</li>
-        {% endfor %}
-      {% else %}
-        <li>No active risk drivers loaded.</li>
-      {% endif %}
-    </ul>
-
-    <!-- Section 5: Underwriting Recommendation -->
-    <div class="p-section-heading">5. Underwriting Terms & Recommendation — ক্রেডিট সুপারিশ</div>
-    <div class="p-rec-box">
-      <h4 id="p-rec-title">{{ result.insights.recommendation.title if result and result.insights and result.insights.recommendation else 'Underwriter Review Required' }}</h4>
-      <p id="p-rec-summary">{{ result.insights.recommendation.summary if result and result.insights and result.insights.recommendation else 'Subject to complete documentation verification and clean CIB record.' }}</p>
-    </div>
-
-    <!-- Official Authorization Signatures -->
-    <div class="p-signature-strip">
-      <div class="p-sig-box">
-        <strong>Prepared By — প্রস্তুতকারী</strong>
-        <span>Credit Analyst (ক্রেডিট অ্যানালিস্ট)</span><br>
-        <span>Signature & Date — স্বাক্ষর ও তারিখ</span>
-      </div>
-      <div class="p-sig-box">
-        <strong>Reviewed By — নিরীক্ষক</strong>
-        <span>Branch Risk Officer (শাখা ঝুঁকি কর্মকর্তা)</span><br>
-        <span>Signature & Date — স্বাক্ষর ও তারিখ</span>
-      </div>
-      <div class="p-sig-box">
-        <strong>Approved By — অনুমোদনকারী</strong>
-        <span>Credit Committee (ক্রেডিট কমিটি সিল ও স্বাক্ষর)</span><br>
-        <span>Official Stamp & Date</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- DRAWER 1: DEVELOPER REST API SPECIFICATION -->
-  <div class="drawer-overlay" id="api-modal">
-    <div class="drawer-dialog">
-      <div class="drawer-header">
-        <h3>Developer REST API Specification — ডেভেলপার এপিআই ডক</h3>
-        <button class="btn-close-modal" onclick="closeModals()">&times;</button>
-      </div>
-      <div class="drawer-body">
-        <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
-          Direct real-time credit scoring integration for CBS & LOS systems: — কোর ব্যাংকিং (CBS) ও লোন অরিজিনেশন সিস্টেমে (LOS) রিয়েল-টাইম ইন্টিগ্রেশনের জন্য নিচের REST এন্ডপয়েন্টটি ব্যবহার করুন:
+      <!-- Underwriting Recommendation -->
+      {% if result.insights.recommendation %}
+      <div class="p-3 rounded mb-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+        <h6 class="fw-bold text-dark mb-1" style="font-size: 14px;">Underwriting Decision & Guidance:</h6>
+        <p class="mb-0 text-secondary" style="font-size: 13px; line-height: 1.5;">
+          <strong>{{ result.insights.recommendation.title }}</strong><br>
+          {{ result.insights.recommendation.summary }}
         </p>
+      </div>
+      {% endif %}
 
-        <div style="font-size:11.5px; font-weight:700; color:var(--brand-accent);">POST /predict (JSON Payload)</div>
-        <div class="code-console">
-          <button class="copy-code-btn" onclick="copyCode('curl-code')">Copy</button>
-          <pre id="curl-code">curl -X POST http://localhost:5000/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "business_age_years": 8,
-    "owner_experience_years": 10,
-    "banking_years": 6,
-    "num_employees": 12,
-    "annual_revenue": 6500000,
-    "loan_amount": 1500000,
-    "debt_to_asset_ratio": 0.35,
-    "collateral_value": 2000000,
-    "past_defaults": 0,
-    "district": "Dhaka",
-    "location_type": "Urban",
-    "sector": "Retail"
-  }'</pre>
+      <!-- Key Risk Drivers -->
+      {% if result.insights.drivers %}
+      <div class="mb-2">
+        <h6 class="fw-semibold text-secondary mb-2" style="font-size: 13px;">KEY DRIVERS & OBSERVATIONS</h6>
+        {% for driver in result.insights.drivers %}
+          <div class="driver-item driver-{{ driver.type }}">
+            {{ driver.text }}
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endif %}
+
+      <div class="mt-3 pt-2 border-top text-end">
+        <a href="/" class="btn btn-sm btn-outline-secondary">Reset / Assess New SME</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- MAIN FORM -->
+    <form action="/predict" method="POST" id="riskForm">
+
+      <!-- 1. Business Profile -->
+      <section class="form-card">
+        <div class="section-header">
+          <div class="section-number">1</div>
+          <h2 class="section-title">Business Profile</h2>
         </div>
+        <div class="row g-3">
+          <!-- District -->
+          <div class="col-md-4">
+            <label class="form-label" for="district">District <span class="req-star">*</span></label>
+            <select class="form-select" id="district" name="district" required>
+              <option value="" disabled {% if not form_data or not form_data.district %}selected{% endif %}>Select district</option>
+              {% for d in districts %}
+              <option value="{{ d }}" {% if form_data and form_data.district == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+            <div class="field-hint">Each district has its own baseline risk.</div>
+          </div>
 
-        <div style="font-size:11.5px; font-weight:700; color:var(--brand-accent); margin-top:14px;">Response JSON Format</div>
-        <div class="code-console">
-          <pre>{
-  "risk_level": "LOW",
-  "probabilities": {
-    "LOW": 0.885,
-    "MEDIUM": 0.095,
-    "HIGH": 0.020
-  },
-  "insights": {
-    "risk_score": 6.8,
-    "recommendation": {
-      "title": "Standard Prime Terms — ঋণ অনুমোদনযোগ্য"
-    }
-  }
-}</pre>
+          <!-- Location Type -->
+          <div class="col-md-4">
+            <label class="form-label" for="location_type">Location Type <span class="req-star">*</span></label>
+            <select class="form-select" id="location_type" name="location_type" required>
+              <option value="" disabled {% if not form_data or not form_data.location_type %}selected{% endif %}>Select location type</option>
+              {% for lt in location_types %}
+              <option value="{{ lt }}" {% if form_data and form_data.location_type == lt %}selected{% endif %}>{{ lt }}</option>
+              {% endfor %}
+            </select>
+            <div class="field-hint">Urban areas typically lower risk slightly.</div>
+          </div>
+
+          <!-- Sector -->
+          <div class="col-md-4">
+            <label class="form-label" for="sector">Sector <span class="req-star">*</span></label>
+            <select class="form-select" id="sector" name="sector" required>
+              <option value="" disabled {% if not form_data or not form_data.sector %}selected{% endif %}>Select sector</option>
+              {% for s in sectors %}
+              <option value="{{ s }}" {% if form_data and form_data.sector == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+            <div class="field-hint">Some sectors trend riskier than others.</div>
+          </div>
+
+          <!-- Business age (years) -->
+          <div class="col-md-4">
+            <label class="form-label" for="business_age_years">Business age (years) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="business_age_years" name="business_age_years" 
+                   placeholder="e.g., 6" value="{{ form_data.business_age_years if form_data else '' }}" required>
+            <div class="field-hint">How long the business has been operating.</div>
+          </div>
+
+          <!-- Owner experience (years) -->
+          <div class="col-md-4">
+            <label class="form-label" for="owner_experience_years">Owner experience (years) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="owner_experience_years" name="owner_experience_years" 
+                   placeholder="e.g., 8" value="{{ form_data.owner_experience_years if form_data else '' }}" required>
+            <div class="field-hint">Relevant experience of primary owner/manager.</div>
+          </div>
+
+          <!-- Banking relationship (years) -->
+          <div class="col-md-4">
+            <label class="form-label" for="banking_years">Banking relationship (years) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="banking_years" name="banking_years" 
+                   placeholder="e.g., 5" value="{{ form_data.banking_years if form_data else '' }}" required>
+            <div class="field-hint">Years with their main bank.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Financials -->
+      <section class="form-card">
+        <div class="section-header">
+          <div class="section-number">2</div>
+          <h2 class="section-title">Financials</h2>
+        </div>
+        <div class="row g-3">
+          <!-- Annual revenue (BDT) -->
+          <div class="col-md-6">
+            <label class="form-label" for="annual_revenue">Annual revenue (BDT) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="annual_revenue" name="annual_revenue" 
+                   placeholder="e.g., 5,000,000" value="{{ form_data.annual_revenue if form_data else '' }}" required>
+            <div class="field-hint">Total annual sales revenue (BDT).</div>
+          </div>
+
+          <!-- Loan amount (BDT) -->
+          <div class="col-md-6">
+            <label class="form-label" for="loan_amount">Loan amount (BDT) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="loan_amount" name="loan_amount" 
+                   placeholder="e.g., 1,200,000" value="{{ form_data.loan_amount if form_data else '' }}" required>
+            <div class="field-hint">Requested or outstanding loan amount (BDT).</div>
+          </div>
+
+          <!-- Debt-to-Asset ratio (0–2) -->
+          <div class="col-md-4">
+            <label class="form-label" for="debt_to_asset_ratio">Debt-to-Asset ratio (0–2) <span class="req-star">*</span></label>
+            <input type="number" step="0.01" min="0" max="10" class="form-control" id="debt_to_asset_ratio" name="debt_to_asset_ratio" 
+                   placeholder="e.g., 0.75" value="{{ form_data.debt_to_asset_ratio if form_data else '' }}" required>
+            <div class="field-hint">Total debt divided by total assets.</div>
+          </div>
+
+          <!-- Number of employees -->
+          <div class="col-md-4">
+            <label class="form-label" for="num_employees">Number of employees <span class="req-star">*</span></label>
+            <input type="number" step="1" min="0" class="form-control" id="num_employees" name="num_employees" 
+                   placeholder="e.g., 12" value="{{ form_data.num_employees if form_data else '' }}" required>
+            <div class="field-hint">Full-time employee count.</div>
+          </div>
+
+          <!-- Collateral value (BDT) -->
+          <div class="col-md-4">
+            <label class="form-label" for="collateral_value">Collateral value (BDT) <span class="req-star">*</span></label>
+            <input type="number" step="any" min="0" class="form-control" id="collateral_value" name="collateral_value" 
+                   placeholder="e.g., 900,000" value="{{ form_data.collateral_value if form_data else '' }}" required>
+            <div class="field-hint">Estimated realizable value for current loan.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Credit History -->
+      <section class="form-card">
+        <div class="section-header">
+          <div class="section-number">3</div>
+          <h2 class="section-title">Credit History</h2>
+        </div>
+        <div class="row g-3">
+          <!-- Past defaults (count) -->
+          <div class="col-md-4">
+            <label class="form-label" for="past_defaults">Past defaults (count) <span class="req-star">*</span></label>
+            <input type="number" step="1" min="0" class="form-control" id="past_defaults" name="past_defaults" 
+                   placeholder="e.g., 0" value="{{ form_data.past_defaults if form_data else '0' }}" required>
+            <div class="field-hint">Serious delinquencies / write-offs.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Buttons & Subtext -->
+      <div class="d-flex align-items-center flex-wrap gap-2 pt-2">
+        <button type="submit" class="btn-predict" id="predictBtn">Predict Risk</button>
+        <button type="button" class="btn-clear" onclick="clearForm()">Clear</button>
+        <span class="actions-note ms-md-2">We’ll show risk, probabilities, and confidence on the next page.</span>
+      </div>
+
+    </form>
+
+    <!-- Batch Upload Modal -->
+    <div class="modal fade" id="batchModal" tabindex="-1" aria-labelledby="batchModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 12px;">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="batchModalLabel">Batch SME Credit Assessment</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-secondary" style="font-size: 13.5px;">
+              Upload a CSV file containing multiple SME loan records to run bulk risk analysis.
+            </p>
+            <div class="mb-3">
+              <a href="/sample_template_csv" class="btn btn-sm btn-outline-primary">
+                Download Sample CSV Template
+              </a>
+            </div>
+            <form id="batchUploadForm" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label for="csvFileInput" class="form-label">Select CSV File</label>
+                <input class="form-control" type="file" id="csvFileInput" name="file" accept=".csv" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" id="batchSubmitBtn">Run Batch Analysis</button>
+            </form>
+
+            <div id="batchResultsArea" class="mt-4 d-none">
+              <h6 class="fw-bold mb-2">Batch Results Summary:</h6>
+              <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                <table class="table table-bordered table-sm" style="font-size: 12.5px;">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>District</th>
+                      <th>Sector</th>
+                      <th>Loan (BDT)</th>
+                      <th>Risk Level</th>
+                      <th>Risk Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="batchResultsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- DRAWER 2: AUDIT ARCHIVE / HISTORY -->
-  <div class="drawer-overlay" id="history-modal">
-    <div class="drawer-dialog">
-      <div class="drawer-header">
-        <h3>Audit Archive & History — সাম্প্রতিক আন্ডাররাইটিং হিস্ট্রি</h3>
-        <button class="btn-close-modal" onclick="closeModals()">&times;</button>
-      </div>
-      <div class="drawer-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <span style="font-size:12px; color:var(--text-muted);">Cached Assessments in Browser — ব্রাউজারে সংরক্ষিত মূল্যায়নসমূহ:</span>
-          <button type="button" class="preset-chip" onclick="clearHistory()">Clear All — মুছে ফেলুন</button>
-        </div>
-        <div id="history-container">
-          <p style="font-size:12px; color:var(--text-muted); text-align:center; padding:24px;">No previous records found — কোনো রেকর্ড সংরক্ষিত নেই।</p>
-        </div>
-      </div>
+    <!-- Footer -->
+    <div class="footer-text">
+      Built with Flask + Bootstrap
     </div>
-  </div>
+
+  </main>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // THEME CONTROLLER
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeLabel = document.getElementById('theme-label');
+    // Clear form fields
+    function clearForm() {
+      const form = document.getElementById('riskForm');
+      form.reset();
+      const selects = form.querySelectorAll('select');
+      selects.forEach(s => s.selectedIndex = 0);
+    }
 
-    function updateThemeUI() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (themeLabel) {
-        themeLabel.textContent = isDark ? 'Light Theme — লাইট' : 'Dark Theme — ডার্ক';
+    // Modal handler
+    let batchModalInstance = null;
+    function toggleBatchModal() {
+      if (!batchModalInstance) {
+        batchModalInstance = new bootstrap.Modal(document.getElementById('batchModal'));
       }
+      batchModalInstance.show();
     }
 
-    if (themeToggle) {
-      updateThemeUI();
-      themeToggle.addEventListener('click', () => {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const newTheme = isDark ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeUI();
-      });
-    }
+    // Batch prediction AJAX
+    document.getElementById('batchUploadForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('csvFileInput');
+      if (!fileInput.files.length) return;
 
-    // WORKSPACE VIEW SWITCHER
-    const tabSingle = document.getElementById('tab-single');
-    const tabBatch = document.getElementById('tab-batch');
-    const viewSingle = document.getElementById('view-single');
-    const viewBatch = document.getElementById('view-batch');
-    const presetContainer = document.getElementById('preset-container');
+      const submitBtn = document.getElementById('batchSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
 
-    tabSingle.addEventListener('click', () => {
-      tabSingle.classList.add('active');
-      tabBatch.classList.remove('active');
-      viewSingle.style.display = 'block';
-      viewBatch.style.display = 'none';
-      if (presetContainer) presetContainer.style.display = 'flex';
-    });
-
-    tabBatch.addEventListener('click', () => {
-      tabBatch.classList.add('active');
-      tabSingle.classList.remove('active');
-      viewSingle.style.display = 'none';
-      viewBatch.style.display = 'block';
-      if (presetContainer) presetContainer.style.display = 'none';
-    });
-
-    // ARCHETYPE PRESETS
-    const presets = {
-      low: {
-        business_age: 10,
-        owner_exp: 12,
-        banking_years: 8,
-        employees: 25,
-        revenue: 8500000,
-        loan: 2000000,
-        debt_asset: 0.25,
-        collateral: 3500000,
-        defaults: 0
-      },
-      medium: {
-        business_age: 4,
-        owner_exp: 5,
-        banking_years: 3,
-        employees: 8,
-        revenue: 3200000,
-        loan: 1800000,
-        debt_asset: 0.55,
-        collateral: 1000000,
-        defaults: 0
-      },
-      high: {
-        business_age: 2,
-        owner_exp: 1,
-        banking_years: 1,
-        employees: 3,
-        revenue: 1400000,
-        loan: 3000000,
-        debt_asset: 0.88,
-        collateral: 0,
-        defaults: 2
-      }
-    };
-
-    function loadPreset(type) {
-      const data = presets[type];
-      if (!data) return;
-      document.getElementById('inp_business_age').value = data.business_age;
-      document.getElementById('inp_owner_exp').value = data.owner_exp;
-      document.getElementById('inp_banking_years').value = data.banking_years;
-      document.getElementById('inp_employees').value = data.employees;
-      document.getElementById('inp_revenue').value = data.revenue;
-      document.getElementById('inp_loan').value = data.loan;
-      document.getElementById('inp_debt_asset').value = data.debt_asset;
-      document.getElementById('inp_collateral').value = data.collateral;
-      document.getElementById('inp_defaults').value = data.defaults;
-      
-      updateLiveCalculations();
-      // Run instant ML appraisal on preset click!
-      runAppraisalAsync();
-    }
-
-    function resetForm() {
-      document.getElementById('risk-form').reset();
-      updateLiveCalculations();
-      resetMemorandumToStandby();
-    }
-
-    // BENGALI BDT FORMATTER (English First - Bengali Second)
-    function formatBDT(amount) {
-      if (!amount || isNaN(amount) || amount <= 0) return '';
-      const num = Number(amount);
-      if (num >= 10000000) {
-        return `BDT ${(num / 10000000).toFixed(2)} Crore — ${(num / 10000000).toFixed(2)} কোটি টাকা`;
-      } else if (num >= 100000) {
-        return `BDT ${(num / 100000).toFixed(2)} Lakh — ${(num / 100000).toFixed(2)} লাখ টাকা`;
-      } else if (num >= 1000) {
-        return `BDT ${(num / 1000).toFixed(1)} Thousand — ${(num / 1000).toFixed(1)} হাজার টাকা`;
-      }
-      return `৳ ${num.toLocaleString('en-IN')}`;
-    }
-
-    // LIVE RATIO CALCULATOR
-    const inpRevenue = document.getElementById('inp_revenue');
-    const inpLoan = document.getElementById('inp_loan');
-    const inpCollateral = document.getElementById('inp_collateral');
-
-    function updateLiveCalculations() {
-      const rev = parseFloat(inpRevenue.value) || 0;
-      const loan = parseFloat(inpLoan.value) || 0;
-      const col = parseFloat(inpCollateral.value) || 0;
-
-      document.getElementById('hint_revenue').textContent = rev > 0 ? formatBDT(rev) : 'Enter Revenue (BDT) — টাকার পরিমাণ লিখুন';
-      document.getElementById('hint_loan').textContent = loan > 0 ? formatBDT(loan) : 'Requested Facility (BDT) — ঋণের পরিমাণ';
-      document.getElementById('hint_collateral').textContent = col > 0 ? formatBDT(col) : 'Immovable Collateral (0 if None) — স্থাবর জামানত (না থাকলে ০)';
-
-      const colCov = loan > 0 ? ((col / loan) * 100).toFixed(1) : '0.0';
-      const loanRev = rev > 0 ? ((loan / rev) * 100).toFixed(1) : '0.0';
-
-      const colTag = document.getElementById('live-collateral-cov');
-      const loanRevTag = document.getElementById('live-loan-rev');
-
-      if (colTag) {
-        colTag.textContent = `${colCov}%`;
-        colTag.style.color = parseFloat(colCov) >= 100 ? 'var(--safe)' : (parseFloat(colCov) > 50 ? 'var(--caution)' : 'var(--danger)');
-      }
-      if (loanRevTag) {
-        loanRevTag.textContent = `${loanRev}%`;
-        loanRevTag.style.color = parseFloat(loanRev) <= 50 ? 'var(--safe)' : (parseFloat(loanRev) <= 80 ? 'var(--caution)' : 'var(--danger)');
-      }
-    }
-
-    [inpRevenue, inpLoan, inpCollateral].forEach(inp => {
-      if (inp) inp.addEventListener('input', updateLiveCalculations);
-    });
-    updateLiveCalculations();
-
-    // ASYNC REAL-TIME UNDERWRITING INFERENCE
-    let currentAppraisalData = null;
-
-    async function runAppraisalAsync() {
-      const form = document.getElementById('risk-form');
-      if (!form) return;
-
-      const formData = new FormData(form);
-      const payload = {};
-      formData.forEach((value, key) => {
-        payload[key] = value;
-      });
-
-      const btn = document.getElementById('submit-btn');
-      const btnText = document.getElementById('btn-text');
-      if (btnText) btnText.textContent = 'Inference Engine Processing — বিশ্লেষণ চলছে...';
-      if (btn) btn.disabled = true;
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
 
       try {
-        const response = await fetch('/predict', {
+        const response = await fetch('/batch_predict', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(payload)
+          body: formData
         });
+        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error('Prediction request failed: ' + response.statusText);
+        if (response.ok && data.status === 'success') {
+          const tbody = document.getElementById('batchResultsTableBody');
+          tbody.innerHTML = '';
+          data.data.forEach(row => {
+            let badgeClass = row.predicted_risk === 'LOW' ? 'bg-success' : (row.predicted_risk === 'MEDIUM' ? 'bg-warning text-dark' : 'bg-danger');
+            tbody.innerHTML += `
+              <tr>
+                <td>${row.index}</td>
+                <td>${row.district}</td>
+                <td>${row.sector}</td>
+                <td>${Number(row.loan_amount).toLocaleString()}</td>
+                <td><span class="badge ${badgeClass}">${row.predicted_risk}</span></td>
+                <td>${row.risk_score}</td>
+              </tr>
+            `;
+          });
+          document.getElementById('batchResultsArea').classList.remove('d-none');
+        } else {
+          alert(data.error || 'Failed to process CSV file.');
         }
-
-        const res = await response.json();
-        currentAppraisalData = res;
-        updateMemorandumUI(res, payload);
       } catch (err) {
-        console.error('Appraisal error:', err);
+        alert('An error occurred during batch processing.');
       } finally {
-        if (btnText) btnText.textContent = 'Run Risk Appraisal & Generate Memo — ঝুঁকি বিশ্লেষণ ও ক্রেডিট মেমো তৈরি করুন';
-        if (btn) btn.disabled = false;
-      }
-    }
-
-    function updateMemorandumUI(res, inputData) {
-      if (!res || !res.risk_level) return;
-      const risk = res.risk_level;
-      const insights = res.insights || {};
-      const score = Number(insights.risk_score || 0);
-      const probs = res.probabilities || {};
-
-      // 1. Top Status Banner
-      const banner = document.getElementById('memo-status-banner');
-      if (banner) {
-        banner.className = `memo-top-banner ${risk}`;
-      }
-
-      const gradeText = document.getElementById('memo-grade-text');
-      if (gradeText) {
-        if (risk === 'LOW') {
-          gradeText.textContent = 'LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Prime Status)';
-        } else if (risk === 'MEDIUM') {
-          gradeText.textContent = 'MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা (Watch Status)';
-        } else {
-          gradeText.textContent = 'HIGH RISK (Subprime) — উচ্চ ঝুঁকি ও সতর্কতা (Subprime Alert)';
-        }
-      }
-
-      const ratingGrade = document.getElementById('memo-rating-grade');
-      if (ratingGrade) {
-        ratingGrade.textContent = risk === 'LOW' ? 'GRADE A (Prime)' : (risk === 'MEDIUM' ? 'GRADE B (Moderate Watch)' : 'GRADE C (Subprime)');
-      }
-
-      const scorePill = document.getElementById('memo-score-pill');
-      if (scorePill) {
-        scorePill.textContent = `${score.toFixed(1)}/100`;
-      }
-
-      // 2. Animated Speedometer Needle & Score Counter
-      const needle = document.getElementById('gauge-needle');
-      if (needle) {
-        const angle = (score / 100 * 180) - 90;
-        needle.setAttribute('transform', `rotate(${angle.toFixed(1)} 100 105)`);
-      }
-
-      const scoreVal = document.getElementById('gauge-score-val');
-      if (scoreVal) {
-        animateCountUp(scoreVal, score);
-      }
-
-      const tierPill = document.getElementById('gauge-tier-pill');
-      const tierLabel = document.getElementById('gauge-tier-label');
-      if (tierPill && tierLabel) {
-        if (score < 35) {
-          tierPill.className = 'gauge-tier-pill safe';
-          tierLabel.textContent = 'SAFE (Prime)';
-        } else if (score < 70) {
-          tierPill.className = 'gauge-tier-pill caution';
-          tierLabel.textContent = 'WATCH (Moderate)';
-        } else {
-          tierPill.className = 'gauge-tier-pill danger';
-          tierLabel.textContent = 'CRITICAL (Subprime)';
-        }
-      }
-
-      // 3. Multi-Class Probability Bars
-      const pLow = (probs.LOW || 0) * 100;
-      const pMed = (probs.MEDIUM || 0) * 100;
-      const pHigh = (probs.HIGH || 0) * 100;
-
-      const barLow = document.getElementById('prob-bar-low');
-      const valLow = document.getElementById('prob-val-low');
-      if (barLow) barLow.style.width = `${pLow.toFixed(1)}%`;
-      if (valLow) valLow.textContent = `${pLow.toFixed(1)}%`;
-
-      const barMed = document.getElementById('prob-bar-med');
-      const valMed = document.getElementById('prob-val-med');
-      if (barMed) barMed.style.width = `${pMed.toFixed(1)}%`;
-      if (valMed) valMed.textContent = `${pMed.toFixed(1)}%`;
-
-      const barHigh = document.getElementById('prob-bar-high');
-      const valHigh = document.getElementById('prob-val-high');
-      if (barHigh) barHigh.style.width = `${pHigh.toFixed(1)}%`;
-      if (valHigh) valHigh.textContent = `${pHigh.toFixed(1)}%`;
-
-      // 4. Key Risk Drivers
-      const driversContainer = document.getElementById('drivers-list-container');
-      const countBadge = document.getElementById('drivers-count-badge');
-      if (driversContainer && insights.drivers) {
-        if (countBadge) countBadge.textContent = `${insights.drivers.length} Factors — ফ্যাক্টর`;
-        driversContainer.innerHTML = insights.drivers.map(d => {
-          let iconSvg = '';
-          if (d.type === 'positive') {
-            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-          } else if (d.type === 'warning') {
-            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>';
-          } else if (d.type === 'negative') {
-            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
-          } else {
-            iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
-          }
-          return `<div class="driver-tag-row ${d.type}">${iconSvg}<span>${d.text}</span></div>`;
-        }).join('');
-      }
-
-      // 5. Underwriting Recommendation Card
-      const recTitle = document.getElementById('rec-title');
-      const recSummary = document.getElementById('rec-summary');
-      const recSymbol = document.getElementById('rec-symbol-box');
-      if (insights.recommendation) {
-        if (recTitle) recTitle.textContent = `Underwriting Recommendation — ${insights.recommendation.title}`;
-        if (recSummary) recSummary.textContent = insights.recommendation.summary;
-        if (recSymbol) {
-          if (risk === 'LOW') {
-            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
-          } else if (risk === 'MEDIUM') {
-            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
-          } else {
-            recSymbol.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>';
-          }
-        }
-      }
-
-      // 6. Sync Printable Credit Memo
-      syncPrintMemo(res, inputData);
-    }
-
-    function resetMemorandumToStandby() {
-      const banner = document.getElementById('memo-status-banner');
-      if (banner) banner.className = 'memo-top-banner STANDBY';
-
-      const gradeText = document.getElementById('memo-grade-text');
-      if (gradeText) gradeText.textContent = 'STANDBY — টেস্ট প্রোফাইল বা ইনপুট দিন';
-
-      const ratingGrade = document.getElementById('memo-rating-grade');
-      if (ratingGrade) ratingGrade.textContent = 'READY';
-
-      const scorePill = document.getElementById('memo-score-pill');
-      if (scorePill) scorePill.textContent = '0.0/100';
-
-      const needle = document.getElementById('gauge-needle');
-      if (needle) needle.setAttribute('transform', 'rotate(-90 100 105)');
-
-      const scoreVal = document.getElementById('gauge-score-val');
-      if (scoreVal) scoreVal.textContent = '0.0';
-
-      const tierPill = document.getElementById('gauge-tier-pill');
-      const tierLabel = document.getElementById('gauge-tier-label');
-      if (tierPill && tierLabel) {
-        tierPill.className = 'gauge-tier-pill';
-        tierLabel.textContent = 'READY TO ASSESS';
-      }
-
-      ['low', 'med', 'high'].forEach(t => {
-        const bar = document.getElementById(`prob-bar-${t}`);
-        const val = document.getElementById(`prob-val-${t}`);
-        if (bar) bar.style.width = '0%';
-        if (val) val.textContent = '0%';
-      });
-
-      const driversContainer = document.getElementById('drivers-list-container');
-      const countBadge = document.getElementById('drivers-count-badge');
-      if (countBadge) countBadge.textContent = '0 Factors — ফ্যাক্টর';
-      if (driversContainer) {
-        driversContainer.innerHTML = '<div class="driver-tag-row neutral"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>Awaiting appraisal input — টেস্ট প্রোফাইলে ক্লিক করুন অথবা তথ্য দিন</span></div>';
-      }
-    }
-
-    function animateCountUp(element, targetVal) {
-      const duration = 750;
-      const startTime = performance.now();
-      const startVal = parseFloat(element.textContent) || 0;
-
-      function step(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const current = startVal + (targetVal - startVal) * ease;
-        element.textContent = current.toFixed(1);
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        } else {
-          element.textContent = targetVal.toFixed(1);
-        }
-      }
-      requestAnimationFrame(step);
-    }
-
-    function syncPrintMemo(res, inputData) {
-      const risk = res ? res.risk_level : '';
-      const insights = res ? res.insights : {};
-
-      const decText = document.getElementById('p-decision-text');
-      const decTier = document.getElementById('p-decision-tier');
-      const decScore = document.getElementById('p-decision-score');
-
-      if (decText) {
-        if (risk === 'LOW') {
-          decText.textContent = '[APPROVED] LOW RISK (Prime) — ঋণ সুবিধা অনুমোদনযোগ্য (Standard Prime Terms)';
-        } else if (risk === 'MEDIUM') {
-          decText.textContent = '[CONDITIONAL] MEDIUM RISK (Watch) — শর্তসাপেক্ষ পর্যালোচনা ও বর্ধিত জামানত';
-        } else if (risk === 'HIGH') {
-          decText.textContent = '[REJECT / HIGH RISK] SUBPRIME — সাবপ্রাইম ঝুঁকি ও উচ্চ খেলাপি সম্ভাবনা';
-        }
-      }
-
-      if (decTier) {
-        decTier.textContent = risk === 'LOW' ? 'GRADE A (Prime)' : (risk === 'MEDIUM' ? 'GRADE B (Moderate Watch)' : 'GRADE C (Subprime)');
-      }
-
-      if (decScore && insights.risk_score !== undefined) {
-        decScore.textContent = `${insights.risk_score}%`;
-      }
-
-      if (res && res.probabilities) {
-        const pLow = document.getElementById('p-prob-low');
-        const pMed = document.getElementById('p-prob-med');
-        const pHigh = document.getElementById('p-prob-high');
-        if (pLow) pLow.textContent = `${((res.probabilities.LOW || 0) * 100).toFixed(1)}%`;
-        if (pMed) pMed.textContent = `${((res.probabilities.MEDIUM || 0) * 100).toFixed(1)}%`;
-        if (pHigh) pHigh.textContent = `${((res.probabilities.HIGH || 0) * 100).toFixed(1)}%`;
-      }
-
-      if (insights.drivers) {
-        const ul = document.getElementById('p-drivers-ul');
-        if (ul) {
-          ul.innerHTML = insights.drivers.map(d => {
-            const tag = d.type === 'positive' ? 'POSITIVE' : (d.type === 'warning' ? 'WARNING' : 'CRITICAL');
-            return `<li><strong>[${tag}]</strong> ${d.text}</li>`;
-          }).join('');
-        }
-      }
-
-      if (insights.recommendation) {
-        const rTitle = document.getElementById('p-rec-title');
-        const rSum = document.getElementById('p-rec-summary');
-        if (rTitle) rTitle.textContent = insights.recommendation.title;
-        if (rSum) rSum.textContent = insights.recommendation.summary;
-      }
-    }
-
-    // PRINT MEMORANDUM SYNC
-    function executePrint() {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      document.getElementById('p-memo-date').textContent = dateStr;
-
-      // Sync form values to print table
-      document.getElementById('p-biz-age').textContent = `${document.getElementById('inp_business_age').value || '-'} Years`;
-      document.getElementById('p-owner-exp').textContent = `${document.getElementById('inp_owner_exp').value || '-'} Years`;
-      document.getElementById('p-banking-age').textContent = `${document.getElementById('inp_banking_years').value || '-'} Years`;
-      document.getElementById('p-employees').textContent = `${document.getElementById('inp_employees').value || '-'}`;
-      document.getElementById('p-location').textContent = `${document.getElementById('inp_district').value || '-'} (${document.getElementById('inp_location').value || '-'})`;
-      document.getElementById('p-sector').textContent = document.getElementById('inp_sector').value || '-';
-
-      document.getElementById('p-loan-amount').textContent = `৳ ${Number(document.getElementById('inp_loan').value || 0).toLocaleString('en-IN')}`;
-      document.getElementById('p-revenue').textContent = `৳ ${Number(document.getElementById('inp_revenue').value || 0).toLocaleString('en-IN')}`;
-      document.getElementById('p-collateral').textContent = `৳ ${Number(document.getElementById('inp_collateral').value || 0).toLocaleString('en-IN')}`;
-      document.getElementById('p-debt-asset').textContent = document.getElementById('inp_debt_asset').value || '-';
-      document.getElementById('p-defaults').textContent = `${document.getElementById('inp_defaults').value || '0'} Times`;
-
-      const loan = parseFloat(document.getElementById('inp_loan').value) || 0;
-      const col = parseFloat(document.getElementById('inp_collateral').value) || 0;
-      const rev = parseFloat(document.getElementById('inp_revenue').value) || 0;
-      
-      if (loan > 0) {
-        document.getElementById('p-col-cov').textContent = `${((col / loan) * 100).toFixed(1)}%`;
-      }
-      if (rev > 0 && loan > 0) {
-        document.getElementById('p-loan-rev').textContent = `${((loan / rev) * 100).toFixed(1)}%`;
-      }
-
-      window.print();
-    }
-
-    // FORM SUBMISSION (INTERCEPTED FOR SILKY SMOOTH ASYNC APPRAISAL)
-    const riskForm = document.getElementById('risk-form');
-    if (riskForm) {
-      riskForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        runAppraisalAsync();
-      });
-    }
-
-    // KEYBOARD SHORTCUT: Ctrl + Enter to submit
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (viewSingle.style.display !== 'none') {
-          runAppraisalAsync();
-        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Run Batch Analysis';
       }
     });
 
-    // MODAL DIALOG CONTROLLER
-    const apiModal = document.getElementById('api-modal');
-    const historyModal = document.getElementById('history-modal');
-
-    document.getElementById('btn-api-docs').addEventListener('click', () => {
-      apiModal.style.display = 'flex';
-    });
-
-    document.getElementById('btn-history').addEventListener('click', () => {
-      renderHistory();
-      historyModal.style.display = 'flex';
-    });
-
-    function closeModals() {
-      apiModal.style.display = 'none';
-      historyModal.style.display = 'none';
-    }
-
-    window.addEventListener('click', (e) => {
-      if (e.target === apiModal || e.target === historyModal) {
-        closeModals();
+    // Auto scroll to result if present
+    window.addEventListener('DOMContentLoaded', () => {
+      const resultElem = document.getElementById('assessmentResult');
+      if (resultElem) {
+        resultElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
-
-    function copyCode(elemId) {
-      const code = document.getElementById(elemId).innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        alert('Code copied to clipboard — কোড ক্লিপবোর্ডে কপি করা হয়েছে!');
-      });
-    }
-
-    // LOCAL ARCHIVE HISTORY
-    function saveToHistory() {
-      const resultBox = document.getElementById('prediction-result-box');
-      if (!resultBox) return;
-
-      const record = {
-        id: Date.now(),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        business_age: document.getElementById('inp_business_age').value,
-        owner_exp: document.getElementById('inp_owner_exp').value,
-        banking_years: document.getElementById('inp_banking_years').value,
-        employees: document.getElementById('inp_employees').value,
-        revenue: document.getElementById('inp_revenue').value,
-        loan: document.getElementById('inp_loan').value,
-        debt_asset: document.getElementById('inp_debt_asset').value,
-        collateral: document.getElementById('inp_collateral').value,
-        defaults: document.getElementById('inp_defaults').value,
-        district: document.getElementById('inp_district').value,
-        location: document.getElementById('inp_location').value,
-        sector: document.getElementById('inp_sector').value,
-        risk: resultBox.classList.contains('LOW') ? 'LOW' : (resultBox.classList.contains('MEDIUM') ? 'MEDIUM' : 'HIGH')
-      };
-
-      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
-      history.unshift(record);
-      if (history.length > 20) history.pop();
-      localStorage.setItem('sme_risk_audit_trail', JSON.stringify(history));
-      alert('Assessment saved to archive — অডিট ট্রেইল আর্কাইভে সংরক্ষিত হয়েছে!');
-    }
-
-    function restoreDossier(recordId) {
-      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
-      const item = history.find(r => r.id === recordId);
-      if (!item) return;
-
-      document.getElementById('inp_business_age').value = item.business_age || '';
-      document.getElementById('inp_owner_exp').value = item.owner_exp || '';
-      document.getElementById('inp_banking_years').value = item.banking_years || '';
-      document.getElementById('inp_employees').value = item.employees || '';
-      document.getElementById('inp_revenue').value = item.revenue || '';
-      document.getElementById('inp_loan').value = item.loan || '';
-      document.getElementById('inp_debt_asset').value = item.debt_asset || '';
-      document.getElementById('inp_collateral').value = item.collateral || '';
-      document.getElementById('inp_defaults').value = item.defaults || '0';
-      if (item.district) document.getElementById('inp_district').value = item.district;
-      if (item.location) document.getElementById('inp_location').value = item.location;
-      if (item.sector) document.getElementById('inp_sector').value = item.sector;
-
-      updateLiveCalculations();
-      closeModals();
-
-      // Switch to single view
-      tabSingle.click();
-    }
-
-    function renderHistory() {
-      const container = document.getElementById('history-container');
-      const history = JSON.parse(localStorage.getItem('sme_risk_audit_trail') || '[]');
-      if (history.length === 0) {
-        container.innerHTML = '<p style="font-size:12px; color:var(--text-muted); text-align:center; padding:24px;">No previous records found — কোনো রেকর্ড সংরক্ষিত নেই।</p>';
-        return;
-      }
-      container.innerHTML = history.map(item => `
-        <div class="history-card-item">
-          <div class="history-card-info">
-            <strong>Facility: ৳ ${Number(item.loan).toLocaleString('en-IN')} — ${item.sector} (${item.district})</strong>
-            <span>Time: ${item.time} | Audit Dossier ID: #${item.id.toString().slice(-4)}</span>
-          </div>
-          <div class="history-actions">
-            <span class="preset-chip ${item.risk === 'LOW' ? 'prime' : (item.risk === 'MEDIUM' ? 'moderate' : 'subprime')}">${item.risk} RISK</span>
-            <button type="button" class="preset-chip" onclick="restoreDossier(${item.id})">Load into Form — লোড করুন</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function clearHistory() {
-      localStorage.removeItem('sme_risk_audit_trail');
-      renderHistory();
-    }
-
-    // BATCH CSV PROCESSING & CLIENT-SIDE FILTERING
-    let batchDataStore = [];
-    let currentFilter = 'ALL';
-    const dropzone = document.getElementById('csv-dropzone');
-
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-      if (e.dataTransfer.files.length) uploadBatchCSV(e.dataTransfer.files[0]);
-    });
-
-    function handleFileSelect(e) {
-      if (e.target.files.length) uploadBatchCSV(e.target.files[0]);
-    }
-
-    function uploadBatchCSV(file) {
-      if (!file.name.endsWith('.csv')) {
-        alert('Please upload a valid .csv file — একটি বৈধ .csv ফাইল আপলোড করুন।');
-        return;
-      }
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const statusBox = document.getElementById('batch-status');
-      const statusText = document.getElementById('batch-status-text');
-      const resultsWrapper = document.getElementById('batch-results-wrapper');
-
-      statusBox.style.display = 'block';
-      statusText.textContent = `${file.name} — Vectorized ML Processing in Progress...`;
-      resultsWrapper.style.display = 'none';
-
-      fetch('/batch_predict', {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(res => {
-        statusBox.style.display = 'none';
-        if (res.error) {
-          alert(`Error: ${res.error}`);
-          return;
-        }
-        batchDataStore = res.data;
-        document.getElementById('count-all').textContent = res.total_records;
-
-        let lowCount = 0, medCount = 0, highCount = 0;
-        res.data.forEach(r => {
-          if (r.predicted_risk === 'LOW') lowCount++;
-          else if (r.predicted_risk === 'MEDIUM') medCount++;
-          else highCount++;
-        });
-
-        document.getElementById('kpi-total').textContent = res.total_records;
-        document.getElementById('kpi-low').textContent = lowCount;
-        document.getElementById('kpi-med').textContent = medCount;
-        document.getElementById('kpi-high').textContent = highCount;
-
-        renderBatchTable();
-        resultsWrapper.style.display = 'block';
-      })
-      .catch(err => {
-        statusBox.style.display = 'none';
-        alert(`Server Error — সার্ভার ত্রুটি: ${err}`);
-      });
-    }
-
-    function filterBatchTable(tier) {
-      currentFilter = tier;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      renderBatchTable();
-    }
-
-    function searchBatchTable() {
-      renderBatchTable();
-    }
-
-    function renderBatchTable() {
-      const tbody = document.getElementById('batch-tbody');
-      const query = (document.getElementById('batch-search-box').value || '').toLowerCase().trim();
-
-      const filtered = batchDataStore.filter(r => {
-        const matchesTier = (currentFilter === 'ALL') || (r.predicted_risk === currentFilter);
-        const matchesQuery = !query || 
-          r.district.toLowerCase().includes(query) || 
-          r.sector.toLowerCase().includes(query) ||
-          r.loan_amount.toString().includes(query);
-        return matchesTier && matchesQuery;
-      });
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-muted);">No records matched — কোনো রেকর্ড মেলেনি।</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(r => `
-        <tr>
-          <td class="num">${r.index}</td>
-          <td>${r.district}</td>
-          <td>${r.sector}</td>
-          <td class="num">৳ ${r.loan_amount.toLocaleString('en-IN')}</td>
-          <td class="num">৳ ${r.annual_revenue.toLocaleString('en-IN')}</td>
-          <td>
-            <span class="preset-chip ${r.predicted_risk === 'LOW' ? 'prime' : (r.predicted_risk === 'MEDIUM' ? 'moderate' : 'subprime')}">
-              ${r.predicted_risk}
-            </span>
-          </td>
-          <td class="num"><strong>${r.risk_score}%</strong></td>
-        </tr>
-      `).join('');
-    }
-
-    function exportBatchResultsCSV() {
-      if (!batchDataStore || batchDataStore.length === 0) return;
-      let csvContent = "data:text/csv;charset=utf-8,Index,District,Sector,Loan_Amount,Annual_Revenue,Predicted_Risk,Risk_Score,Prob_Low,Prob_Medium,Prob_High\n";
-      batchDataStore.forEach(r => {
-        csvContent += `${r.index},"${r.district}","${r.sector}",${r.loan_amount},${r.annual_revenue},${r.predicted_risk},${r.risk_score},${r.prob_low},${r.prob_medium},${r.prob_high}\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `sme_credit_portfolio_risk_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
   </script>
 </body>
 </html>
