@@ -1,1018 +1,236 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SME Risk Detector - Credit Risk Assessment</title>
-  
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f4f6f9;
-      color: #334155;
-      margin: 0;
-      padding-bottom: 40px;
-    }
-
-    /* Top Blue Navbar */
-    .top-navbar {
-      background-color: #0066ff;
-      color: #ffffff;
-      padding: 14px 24px;
-      font-weight: 600;
-      font-size: 17px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .main-container {
-      max-width: 800px;
-      margin: 28px auto;
-      padding: 0 16px;
-    }
-
-    /* Header title & step badge */
-    .page-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 4px;
-    }
-
-    .page-subtitle {
-      font-size: 13.5px;
-      color: #64748b;
-      margin-bottom: 0;
-    }
-
-    .step-badge {
-      background-color: #e0edff;
-      color: #0066ff;
-      font-size: 12.5px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    /* Sample quick loader */
-    .sample-loader-bar {
-      background: #ffffff;
-      border: 1px dashed #cbd5e1;
-      border-radius: 8px;
-      padding: 8px 14px;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    .sample-btn {
-      font-size: 12px;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      color: #334155;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .sample-btn:hover {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-
-    /* Form Section Cards */
-    .form-card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 22px 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .section-number {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background-color: #dbeafe;
-      color: #1d4ed8;
-      font-weight: 700;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .section-title {
-      font-size: 16.5px;
-      font-weight: 600;
-      color: #1e293b;
-      margin: 0;
-    }
-
-    /* Input & Labels */
-    .form-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: #334155;
-      margin-bottom: 5px;
-    }
-
-    .req-star {
-      color: #ef4444;
-      font-weight: 600;
-    }
-
-    .form-control, .form-select {
-      font-size: 13.5px;
-      border-color: #cbd5e1;
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: #1e293b;
-    }
-
-    .form-control::placeholder {
-      color: #94a3b8;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    .field-hint {
-      font-size: 11.5px;
-      color: #64748b;
-      margin-top: 4px;
-      line-height: 1.35;
-    }
-
-    .live-format-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      color: #0284c7;
-      background-color: #f0f9ff;
-      border: 1px solid #bae6fd;
-      padding: 1px 6px;
-      border-radius: 4px;
-      margin-left: 4px;
-    }
-
-    .live-ratio-badge {
-      display: inline-block;
-      font-size: 11.5px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 4px;
-      margin-top: 4px;
-    }
-
-    /* Buttons */
-    .btn-predict {
-      background-color: #0066ff;
-      color: #ffffff;
-      border: none;
-      font-weight: 600;
-      font-size: 14px;
-      padding: 9px 24px;
-      border-radius: 8px;
-      transition: background-color 0.15s ease-in-out;
-    }
-
-    .btn-predict:hover {
-      background-color: #0052cc;
-      color: #ffffff;
-    }
-
-    .btn-clear {
-      background-color: #ffffff;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      font-weight: 500;
-      font-size: 14px;
-      padding: 9px 20px;
-      border-radius: 8px;
-      transition: all 0.15s ease-in-out;
-    }
-
-    .btn-clear:hover {
-      background-color: #f1f5f9;
-      color: #1e293b;
-      border-color: #94a3b8;
-    }
-
-    .actions-note {
-      font-size: 13px;
-      color: #64748b;
-    }
-
-    /* Result styling */
-    .result-card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    }
-
-    .risk-badge-low {
-      background-color: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
-
-    .risk-badge-medium {
-      background-color: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fde68a;
-    }
-
-    .risk-badge-high {
-      background-color: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-    }
-
-    .metric-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 12px 14px;
-      text-align: center;
-    }
-
-    .metric-label {
-      font-size: 11.5px;
-      color: #64748b;
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    .metric-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-top: 2px;
-    }
-
-    .prob-bar-container {
-      margin-bottom: 12px;
-    }
-
-    .prob-bar-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12.5px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .progress {
-      height: 8px;
-      border-radius: 4px;
-      background-color: #e2e8f0;
-    }
-
-    .driver-item {
-      font-size: 13px;
-      padding: 7px 12px;
-      border-radius: 6px;
-      margin-bottom: 6px;
-    }
-
-    .driver-positive {
-      background-color: #f0fdf4;
-      color: #166534;
-      border-left: 3px solid #22c55e;
-    }
-
-    .driver-warning {
-      background-color: #fffbeb;
-      color: #92400e;
-      border-left: 3px solid #f59e0b;
-    }
-
-    .driver-negative {
-      background-color: #fef2f2;
-      color: #991b1b;
-      border-left: 3px solid #ef4444;
-    }
-
-    .driver-neutral {
-      background-color: #f8fafc;
-      color: #475569;
-      border-left: 3px solid #94a3b8;
-    }
-
-    .footer-text {
-      text-align: center;
-      font-size: 12.5px;
-      color: #94a3b8;
-      margin-top: 36px;
-    }
-
-    /* Formal Print Memo Sheet */
-    @media print {
-      body {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-      }
-      .top-navbar, .step-badge, .sample-loader-bar, #riskForm, 
-      .footer-text, .btn-no-print, .modal, .alert {
-        display: none !important;
-      }
-      .main-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      .result-card {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-      }
-      .print-header {
-        display: block !important;
-        border-bottom: 2px solid #000000;
-        padding-bottom: 12px;
-        margin-bottom: 20px;
-      }
-      .print-signature-section {
-        display: flex !important;
-        justify-content: space-between;
-        margin-top: 60px;
-        padding-top: 10px;
-      }
-      .progress {
-        border: 1px solid #94a3b8 !important;
-      }
-    }
-
-    .print-header, .print-signature-section {
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SME Credit Risk Detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14213D;
+    --ink-soft: #46527A;
+    --accent: #0E9C82;
+    --accent-hover: #0B7C68;
+    --low: #1E7B4D;
+    --medium: #B4700A;
+    --high: #C13B2E;
+    --glass-bg: rgba(255,255,255,0.42);
+    --glass-border: rgba(255,255,255,0.65);
+    --field-bg: rgba(255,255,255,0.45);
+    --field-border: rgba(20,33,61,0.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: 'Hind Siliguri', -apple-system, sans-serif;
+    color: var(--ink);
+    margin: 0;
+    padding: 32px 20px;
+    line-height: 1.4;
+    font-size: 14px;
+    background:
+      radial-gradient(circle at 12% 15%, rgba(94, 234, 212, 0.55) 0%, rgba(94, 234, 212, 0) 45%),
+      radial-gradient(circle at 88% 20%, rgba(129, 140, 248, 0.45) 0%, rgba(129, 140, 248, 0) 45%),
+      radial-gradient(circle at 20% 90%, rgba(56, 189, 248, 0.4) 0%, rgba(56, 189, 248, 0) 50%),
+      radial-gradient(circle at 90% 85%, rgba(52, 211, 153, 0.4) 0%, rgba(52, 211, 153, 0) 50%),
+      linear-gradient(160deg, #E9F4F2 0%, #E4EBF9 50%, #EAF2F0 100%);
+    background-attachment: fixed;
+  }
+  .page { max-width: 660px; margin: 0 auto; }
+  .masthead { margin-bottom: 22px; text-align: center; }
+  .masthead .eyebrow { font-size: 12px; color: var(--accent-hover); font-weight: 600; letter-spacing: 0.03em; margin: 0 0 6px; }
+  .masthead h1 { font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .masthead p { font-size: 13px; color: var(--ink-soft); margin: 0 auto; max-width: 48ch; }
+  .card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 26px 28px 28px;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: 0 1px 1px rgba(255,255,255,0.6) inset, 0 12px 40px rgba(20,33,61,0.10);
+  }
+  .error {
+    background: rgba(193,59,46,0.14);
+    border-left: 3px solid var(--high);
+    color: #8C2A20;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .result {
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    backdrop-filter: blur(10px);
+  }
+  .result.LOW { background: rgba(30,123,77,0.14); }
+  .result.MEDIUM { background: rgba(180,112,10,0.14); }
+  .result.HIGH { background: rgba(193,59,46,0.14); }
+  .result-main { min-width: 110px; }
+  .result-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); margin: 0; }
+  .result-level { font-size: 21px; font-weight: 700; margin: 2px 0 0; }
+  .result.LOW .result-level { color: var(--low); }
+  .result.MEDIUM .result-level { color: var(--medium); }
+  .result.HIGH .result-level { color: var(--high); }
+  .result-probs { flex: 1; min-width: 180px; }
+  .prob-row { display: grid; grid-template-columns: 56px 1fr 44px; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 12px; }
+  .prob-row:last-child { margin-bottom: 0; }
+  .prob-track { background: rgba(20,33,61,0.10); border-radius: 5px; height: 5px; overflow: hidden; }
+  .prob-fill { height: 100%; border-radius: 5px; background: currentColor; }
+  .prob-row.LOW { color: var(--low); }
+  .prob-row.MEDIUM { color: var(--medium); }
+  .prob-row.HIGH { color: var(--high); }
+  .prob-pct { text-align: right; color: var(--ink-soft); }
+  form { margin: 0; }
+  .section-title { font-size: 11px; font-weight: 600; color: var(--accent-hover); margin: 20px 0 10px; letter-spacing: 0.02em; }
+  .section-title:first-of-type { margin-top: 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 14px; }
+  .field label { display: block; font-size: 11.5px; margin-bottom: 4px; }
+  .field label .en { color: var(--ink); font-weight: 500; }
+  .field label .bn { color: var(--ink-soft); font-weight: 400; }
+  .field input, .field select {
+    width: 100%; padding: 7px 9px; border: 1px solid var(--field-border); border-radius: 8px;
+    font-size: 13px; font-family: inherit; color: var(--ink); background: var(--field-bg);
+    backdrop-filter: blur(6px); transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.75); }
+  .submit-row { display: flex; justify-content: flex-end; margin-top: 22px; }
+  button {
+    background: var(--accent); color: #fff; border: none; padding: 10px 22px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 600; font-family: inherit; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(14,156,130,0.35); transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+  button:hover { background: var(--accent-hover); box-shadow: 0 6px 20px rgba(11,124,104,0.4); }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
+    .card { padding: 20px; }
+    .submit-row { justify-content: stretch; }
+    button { width: 100%; }
+  }
+</style>
 </head>
 <body>
+<div class="page">
 
-  <!-- Top Blue Bar -->
-  <header class="top-navbar">
-    <div class="container-fluid d-flex justify-content-between align-items-center" style="max-width: 800px; padding: 0;">
-      <span>SME Risk Detector</span>
-      <button type="button" class="btn btn-sm btn-outline-light btn-no-print" onclick="toggleBatchModal()" style="font-size: 12px; border-radius: 6px;">
-        CSV Batch Upload
-      </button>
-    </div>
-  </header>
+  <div class="masthead">
+    <p class="eyebrow">ক্রেডিট রিস্ক অ্যাসেসমেন্ট সিস্টেম</p>
+    <h1>SME Credit Risk Detection</h1>
+    <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর নির্ধারণের জন্য একটি বিশ্লেষণধর্মী টুল।</p>
+  </div>
 
-  <main class="main-container">
+  <div class="card">
 
-    <!-- Print Header (Visible only when printed) -->
-    <div class="print-header">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h3 style="font-weight: 800; margin: 0;">COMMERCIAL BANKING SME CREDIT MEMO</h3>
-          <p style="margin: 4px 0 0; font-size: 12px; color: #475569;">Automated Underwriting & Credit Risk Evaluation Sheet</p>
-        </div>
-        <div style="text-align: right; font-size: 12px;">
-          <div><strong>Date:</strong> <span id="printDate"></span></div>
-          <div><strong>Doc ID:</strong> CR-SME-<span id="printDocId"></span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-start mb-3">
-      <div>
-        <h1 class="page-title">SME Applicant Details</h1>
-        <p class="page-subtitle">Fill in the business profile and financing info to predict risk.</p>
-      </div>
-      <div>
-        {% if result %}
-        <span class="step-badge" style="background-color: #dcfce7; color: #15803d;">
-          Step 2 of 2 • Assessment Result
-        </span>
-        {% else %}
-        <span class="step-badge">
-          Step 1 of 2 • Input
-        </span>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- 2. One-Click Sample Case Loader Bar -->
-    <div class="sample-loader-bar btn-no-print">
-      <div class="text-secondary fw-semibold" style="font-size: 12.5px;">
-        Quick Sample Cases:
-      </div>
-      <div class="d-flex gap-2 flex-wrap">
-        <button type="button" class="sample-btn" onclick="loadSample('prime')">
-          ✓ Prime Low-Risk
-        </button>
-        <button type="button" class="sample-btn" onclick="loadSample('moderate')">
-          ⚡ Moderate Risk
-        </button>
-        <button type="button" class="sample-btn" onclick="loadSample('subprime')">
-          ⚠ Subprime High-Risk
-        </button>
-      </div>
-    </div>
-
-    <!-- Error Alert -->
     {% if error %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; font-size: 13.5px;">
-      <strong>Error:</strong> {{ error }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+    <div class="error">{{ error }}</div>
     {% endif %}
 
-    <!-- 3. RESULTS SECTION (Displayed if prediction is performed) -->
     {% if result %}
-    <div class="result-card mb-4" id="assessmentResult">
-      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-        <div>
-          <h5 class="mb-0 fw-bold text-dark">Credit Risk Assessment Report</h5>
-          <small class="text-muted">Analysis complete based on financial & credit metrics</small>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <button type="button" onclick="window.print()" class="btn btn-sm btn-outline-dark btn-no-print" style="font-size: 12px; border-radius: 6px;">
-            🖨 Print / Export PDF
-          </button>
-          {% if result.risk_level == 'LOW' %}
-            <span class="badge risk-badge-low px-3 py-2 rounded-pill fs-6 fw-bold">LOW RISK</span>
-          {% elif result.risk_level == 'MEDIUM' %}
-            <span class="badge risk-badge-medium px-3 py-2 rounded-pill fs-6 fw-bold">MEDIUM RISK</span>
-          {% else %}
-            <span class="badge risk-badge-high px-3 py-2 rounded-pill fs-6 fw-bold">HIGH RISK</span>
-          {% endif %}
-        </div>
+    <div class="result {{ result.risk_level }}">
+      <div class="result-main">
+        <p class="result-label">পূর্বাভাসকৃত ঝুঁকি</p>
+        <p class="result-level">{{ result.risk_level }}</p>
       </div>
-
-      <!-- Probability Bars -->
-      <div class="mb-4">
-        <h6 class="fw-semibold text-secondary mb-3" style="font-size: 13px;">PROBABILITY DISTRIBUTION</h6>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="prob-bar-container">
-              <div class="prob-bar-label">
-                <span class="text-success fw-medium">Low Risk</span>
-                <span class="fw-bold">{{ (result.probabilities.LOW * 100)|round(1) }}%</span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar bg-success" style="width: {{ result.probabilities.LOW * 100 }}%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="prob-bar-container">
-              <div class="prob-bar-label">
-                <span class="text-warning fw-medium" style="color: #d97706 !important;">Medium Risk</span>
-                <span class="fw-bold">{{ (result.probabilities.MEDIUM * 100)|round(1) }}%</span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar bg-warning" style="width: {{ result.probabilities.MEDIUM * 100 }}%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="prob-bar-container">
-              <div class="prob-bar-label">
-                <span class="text-danger fw-medium">High Risk</span>
-                <span class="fw-bold">{{ (result.probabilities.HIGH * 100)|round(1) }}%</span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar bg-danger" style="width: {{ result.probabilities.HIGH * 100 }}%"></div>
-              </div>
-            </div>
-          </div>
+      <div class="result-probs">
+        {% for level, prob in result.probabilities.items() %}
+        <div class="prob-row {{ level }}">
+          <span>{{ level }}</span>
+          <div class="prob-track"><div class="prob-fill" style="width: {{ (prob*100)|round(1) }}%;"></div></div>
+          <span class="prob-pct">{{ (prob*100)|round(1) }}%</span>
         </div>
-      </div>
-
-      <!-- Metrics Row -->
-      {% if result.insights %}
-      <div class="row g-2 mb-4">
-        <div class="col-md-3 col-6">
-          <div class="metric-box">
-            <div class="metric-label">Risk Score</div>
-            <div class="metric-value">{{ result.insights.risk_score }}/100</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="metric-box">
-            <div class="metric-label">Collateral (LTV)</div>
-            <div class="metric-value">{{ result.insights.collateral_coverage }}%</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="metric-box">
-            <div class="metric-label">Loan to Revenue</div>
-            <div class="metric-value">{{ result.insights.loan_to_revenue }}%</div>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="metric-box">
-            <div class="metric-label">Debt-to-Asset</div>
-            <div class="metric-value">{{ form_data.debt_to_asset_ratio if form_data else '0' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Underwriting Recommendation -->
-      {% if result.insights.recommendation %}
-      <div class="p-3 rounded mb-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-        <h6 class="fw-bold text-dark mb-1" style="font-size: 14px;">Underwriting Decision & Guidance:</h6>
-        <p class="mb-0 text-secondary" style="font-size: 13px; line-height: 1.5;">
-          <strong>{{ result.insights.recommendation.title }}</strong><br>
-          {{ result.insights.recommendation.summary }}
-        </p>
-      </div>
-      {% endif %}
-
-      <!-- Key Risk Drivers -->
-      {% if result.insights.drivers %}
-      <div class="mb-2">
-        <h6 class="fw-semibold text-secondary mb-2" style="font-size: 13px;">KEY DRIVERS & OBSERVATIONS</h6>
-        {% for driver in result.insights.drivers %}
-          <div class="driver-item driver-{{ driver.type }}">
-            {{ driver.text }}
-          </div>
         {% endfor %}
       </div>
-      {% endif %}
-      {% endif %}
-
-      <!-- Print Signatures Section (Visible in Print Memo) -->
-      <div class="print-signature-section">
-        <div style="text-align: center; width: 200px;">
-          <div style="border-top: 1px solid #000; padding-top: 6px; font-size: 12px;">Credit Underwriter Signature</div>
-        </div>
-        <div style="text-align: center; width: 200px;">
-          <div style="border-top: 1px solid #000; padding-top: 6px; font-size: 12px;">Branch Manager / Approver</div>
-        </div>
-      </div>
-
-      <div class="mt-3 pt-2 border-top text-end btn-no-print">
-        <a href="/" class="btn btn-sm btn-outline-secondary">Reset / Assess New SME</a>
-      </div>
     </div>
     {% endif %}
 
-    <!-- MAIN FORM -->
-    <form action="/predict" method="POST" id="riskForm">
+    <form method="POST" action="/predict">
 
-      <!-- 1. Business Profile -->
-      <section class="form-card">
-        <div class="section-header">
-          <div class="section-number">1</div>
-          <h2 class="section-title">Business Profile</h2>
+      <p class="section-title">অবস্থান ও খাত</p>
+      <div class="grid">
+        <div class="field">
+          <label><span class="en">District</span> <span class="bn">— জেলা</span></label>
+          <select name="district" required>
+            {% for d in districts %}
+            <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
         </div>
-        <div class="row g-3">
-          <!-- District -->
-          <div class="col-md-4">
-            <label class="form-label" for="district">District <span class="req-star">*</span></label>
-            <select class="form-select" id="district" name="district" required>
-              <option value="" disabled {% if not form_data or not form_data.district %}selected{% endif %}>Select district</option>
-              {% for d in districts %}
-              <option value="{{ d }}" {% if form_data and form_data.district == d %}selected{% endif %}>{{ d }}</option>
-              {% endfor %}
-            </select>
-            <div class="field-hint">Each district has its own baseline risk.</div>
-          </div>
-
-          <!-- Location Type -->
-          <div class="col-md-4">
-            <label class="form-label" for="location_type">Location Type <span class="req-star">*</span></label>
-            <select class="form-select" id="location_type" name="location_type" required>
-              <option value="" disabled {% if not form_data or not form_data.location_type %}selected{% endif %}>Select location type</option>
-              {% for lt in location_types %}
-              <option value="{{ lt }}" {% if form_data and form_data.location_type == lt %}selected{% endif %}>{{ lt }}</option>
-              {% endfor %}
-            </select>
-            <div class="field-hint">Urban areas typically lower risk slightly.</div>
-          </div>
-
-          <!-- Sector -->
-          <div class="col-md-4">
-            <label class="form-label" for="sector">Sector <span class="req-star">*</span></label>
-            <select class="form-select" id="sector" name="sector" required>
-              <option value="" disabled {% if not form_data or not form_data.sector %}selected{% endif %}>Select sector</option>
-              {% for s in sectors %}
-              <option value="{{ s }}" {% if form_data and form_data.sector == s %}selected{% endif %}>{{ s }}</option>
-              {% endfor %}
-            </select>
-            <div class="field-hint">Some sectors trend riskier than others.</div>
-          </div>
-
-          <!-- Business age (years) -->
-          <div class="col-md-4">
-            <label class="form-label" for="business_age_years">Business age (years) <span class="req-star">*</span></label>
-            <input type="number" step="any" min="0" class="form-control" id="business_age_years" name="business_age_years" 
-                   placeholder="e.g., 6" value="{{ form_data.business_age_years if form_data else '' }}" required>
-            <div class="field-hint">How long the business has been operating.</div>
-          </div>
-
-          <!-- Owner experience (years) -->
-          <div class="col-md-4">
-            <label class="form-label" for="owner_experience_years">Owner experience (years) <span class="req-star">*</span></label>
-            <input type="number" step="any" min="0" class="form-control" id="owner_experience_years" name="owner_experience_years" 
-                   placeholder="e.g., 8" value="{{ form_data.owner_experience_years if form_data else '' }}" required>
-            <div class="field-hint">Relevant experience of primary owner/manager.</div>
-          </div>
-
-          <!-- Banking relationship (years) -->
-          <div class="col-md-4">
-            <label class="form-label" for="banking_years">Banking relationship (years) <span class="req-star">*</span></label>
-            <input type="number" step="any" min="0" class="form-control" id="banking_years" name="banking_years" 
-                   placeholder="e.g., 5" value="{{ form_data.banking_years if form_data else '' }}" required>
-            <div class="field-hint">Years with their main bank.</div>
-          </div>
+        <div class="field">
+          <label><span class="en">Location</span> <span class="bn">— অবস্থানের ধরন</span></label>
+          <select name="location_type" required>
+            {% for lt in location_types %}
+            <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
+            {% endfor %}
+          </select>
         </div>
-      </section>
-
-      <!-- 2. Financials -->
-      <section class="form-card">
-        <div class="section-header">
-          <div class="section-number">2</div>
-          <h2 class="section-title">Financials</h2>
+        <div class="field">
+          <label><span class="en">Sector</span> <span class="bn">— ব্যবসার খাত</span></label>
+          <select name="sector" required>
+            {% for s in sectors %}
+            <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
         </div>
-        <div class="row g-3">
-          <!-- Annual revenue (BDT) -->
-          <div class="col-md-6">
-            <label class="form-label" for="annual_revenue">
-              Annual revenue (BDT) <span class="req-star">*</span>
-              <span id="revenueWords" class="live-format-badge d-none"></span>
-            </label>
-            <input type="number" step="any" min="0" class="form-control" id="annual_revenue" name="annual_revenue" 
-                   placeholder="e.g., 5,000,000" value="{{ form_data.annual_revenue if form_data else '' }}" 
-                   oninput="updateLiveFormat('annual_revenue', 'revenueWords')" required>
-            <div class="field-hint">Total annual sales revenue (BDT).</div>
-          </div>
-
-          <!-- Loan amount (BDT) -->
-          <div class="col-md-6">
-            <label class="form-label" for="loan_amount">
-              Loan amount (BDT) <span class="req-star">*</span>
-              <span id="loanWords" class="live-format-badge d-none"></span>
-            </label>
-            <input type="number" step="any" min="0" class="form-control" id="loan_amount" name="loan_amount" 
-                   placeholder="e.g., 1,200,000" value="{{ form_data.loan_amount if form_data else '' }}" 
-                   oninput="updateLiveFormat('loan_amount', 'loanWords'); updateLtvPreview();" required>
-            <div class="field-hint">Requested or outstanding loan amount (BDT).</div>
-          </div>
-
-          <!-- Debt-to-Asset ratio (0–2) -->
-          <div class="col-md-4">
-            <label class="form-label" for="debt_to_asset_ratio">Debt-to-Asset ratio (0–2) <span class="req-star">*</span></label>
-            <input type="number" step="0.01" min="0" max="10" class="form-control" id="debt_to_asset_ratio" name="debt_to_asset_ratio" 
-                   placeholder="e.g., 0.75" value="{{ form_data.debt_to_asset_ratio if form_data else '' }}" required>
-            <div class="field-hint">Total debt divided by total assets.</div>
-          </div>
-
-          <!-- Number of employees -->
-          <div class="col-md-4">
-            <label class="form-label" for="num_employees">Number of employees <span class="req-star">*</span></label>
-            <input type="number" step="1" min="0" class="form-control" id="num_employees" name="num_employees" 
-                   placeholder="e.g., 12" value="{{ form_data.num_employees if form_data else '' }}" required>
-            <div class="field-hint">Full-time employee count.</div>
-          </div>
-
-          <!-- Collateral value (BDT) -->
-          <div class="col-md-4">
-            <label class="form-label" for="collateral_value">
-              Collateral value (BDT) <span class="req-star">*</span>
-              <span id="collateralWords" class="live-format-badge d-none"></span>
-            </label>
-            <input type="number" step="any" min="0" class="form-control" id="collateral_value" name="collateral_value" 
-                   placeholder="e.g., 900,000" value="{{ form_data.collateral_value if form_data else '' }}" 
-                   oninput="updateLiveFormat('collateral_value', 'collateralWords'); updateLtvPreview();" required>
-            <div class="field-hint" id="collateralHint">Estimated realizable value for current loan.</div>
-            <div id="ltvLivePreview" class="d-none"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. Credit History -->
-      <section class="form-card">
-        <div class="section-header">
-          <div class="section-number">3</div>
-          <h2 class="section-title">Credit History</h2>
-        </div>
-        <div class="row g-3">
-          <!-- Past defaults (count) -->
-          <div class="col-md-4">
-            <label class="form-label" for="past_defaults">Past defaults (count) <span class="req-star">*</span></label>
-            <input type="number" step="1" min="0" class="form-control" id="past_defaults" name="past_defaults" 
-                   placeholder="e.g., 0" value="{{ form_data.past_defaults if form_data else '0' }}" required>
-            <div class="field-hint">Serious delinquencies / write-offs.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Action Buttons & Subtext -->
-      <div class="d-flex align-items-center flex-wrap gap-2 pt-2 btn-no-print">
-        <button type="submit" class="btn-predict" id="predictBtn">Predict Risk</button>
-        <button type="button" class="btn-clear" onclick="clearForm()">Clear</button>
-        <span class="actions-note ms-md-2">We’ll show risk, probabilities, and confidence on the next page.</span>
       </div>
 
+      <p class="section-title">ব্যবসার প্রোফাইল</p>
+      <div class="grid">
+        <div class="field">
+          <label><span class="en">Business Age</span> <span class="bn">— বয়স (বছর)</span></label>
+          <input type="number" step="1" name="business_age_years" required value="{{ form_data.business_age_years if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Owner Experience</span> <span class="bn">— অভিজ্ঞতা (বছর)</span></label>
+          <input type="number" step="1" name="owner_experience_years" required value="{{ form_data.owner_experience_years if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Banking Years</span> <span class="bn">— ব্যাংকিং সম্পর্ক</span></label>
+          <input type="number" step="1" name="banking_years" required value="{{ form_data.banking_years if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Employees</span> <span class="bn">— কর্মচারী সংখ্যা</span></label>
+          <input type="number" step="1" name="num_employees" required value="{{ form_data.num_employees if form_data else '' }}">
+        </div>
+      </div>
+
+      <p class="section-title">আর্থিক তথ্য</p>
+      <div class="grid">
+        <div class="field">
+          <label><span class="en">Annual Revenue</span> <span class="bn">— বার্ষিক আয়</span></label>
+          <input type="number" step="any" name="annual_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Loan Amount</span> <span class="bn">— ঋণের পরিমাণ</span></label>
+          <input type="number" step="any" name="loan_amount" required value="{{ form_data.loan_amount if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Debt/Asset Ratio</span> <span class="bn">— ঋণ-সম্পদ অনুপাত</span></label>
+          <input type="number" step="any" name="debt_to_asset_ratio" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Collateral Value</span> <span class="bn">— জামানত (না থাকলে ০)</span></label>
+          <input type="number" step="any" name="collateral_value" required value="{{ form_data.collateral_value if form_data else '' }}">
+        </div>
+        <div class="field">
+          <label><span class="en">Past Defaults</span> <span class="bn">— ঋণখেলাপি (সংখ্যা)</span></label>
+          <input type="number" step="1" name="past_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit">ঝুঁকি পূর্বাভাস দাও</button>
+      </div>
     </form>
-
-    <!-- Batch Upload Modal -->
-    <div class="modal fade" id="batchModal" tabindex="-1" aria-labelledby="batchModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="border-radius: 12px;">
-          <div class="modal-header">
-            <h5 class="modal-title fw-bold" id="batchModalLabel">Batch SME Credit Assessment</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p class="text-secondary" style="font-size: 13.5px;">
-              Upload a CSV file containing multiple SME loan records to run bulk risk analysis.
-            </p>
-            <div class="mb-3">
-              <a href="/sample_template_csv" class="btn btn-sm btn-outline-primary">
-                Download Sample CSV Template
-              </a>
-            </div>
-            <form id="batchUploadForm" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="csvFileInput" class="form-label">Select CSV File</label>
-                <input class="form-control" type="file" id="csvFileInput" name="file" accept=".csv" required>
-              </div>
-              <button type="submit" class="btn btn-primary btn-sm" id="batchSubmitBtn">Run Batch Analysis</button>
-            </form>
-
-            <div id="batchResultsArea" class="mt-4 d-none">
-              <h6 class="fw-bold mb-2">Batch Results Summary:</h6>
-              <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
-                <table class="table table-bordered table-sm" style="font-size: 12.5px;">
-                  <thead class="table-light">
-                    <tr>
-                      <th>#</th>
-                      <th>District</th>
-                      <th>Sector</th>
-                      <th>Loan (BDT)</th>
-                      <th>Risk Level</th>
-                      <th>Risk Score</th>
-                    </tr>
-                  </thead>
-                  <tbody id="batchResultsTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer-text">
-      Built with Flask + Bootstrap
-    </div>
-
-  </main>
-
-  <!-- Bootstrap 5 Bundle JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // Format BDT numbers to Lakh/Crore words
-    function formatToBengaliCurrency(num) {
-      if (!num || isNaN(num) || num <= 0) return '';
-      const n = Number(num);
-      let formatted = '৳ ' + n.toLocaleString('en-IN');
-      if (n >= 10000000) {
-        formatted += ` (${(n / 10000000).toFixed(2)} Crore)`;
-      } else if (n >= 100000) {
-        formatted += ` (${(n / 100000).toFixed(2)} Lakh)`;
-      } else if (n >= 1000) {
-        formatted += ` (${(n / 1000).toFixed(1)}k)`;
-      }
-      return formatted;
-    }
-
-    // Live update helper for currency inputs
-    function updateLiveFormat(inputId, badgeId) {
-      const input = document.getElementById(inputId);
-      const badge = document.getElementById(badgeId);
-      if (!input || !badge) return;
-
-      const val = parseFloat(input.value);
-      if (val > 0) {
-        badge.textContent = formatToBengaliCurrency(val);
-        badge.classList.remove('d-none');
-      } else {
-        badge.classList.add('d-none');
-      }
-    }
-
-    // 4. Live Collateral Coverage (LTV) Preview
-    function updateLtvPreview() {
-      const loanVal = parseFloat(document.getElementById('loan_amount')?.value || 0);
-      const colVal = parseFloat(document.getElementById('collateral_value')?.value || 0);
-      const previewDiv = document.getElementById('ltvLivePreview');
-      if (!previewDiv) return;
-
-      if (loanVal > 0 && colVal >= 0) {
-        const coverage = ((colVal / loanVal) * 100).toFixed(1);
-        let badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
-        let text = `Coverage: ${coverage}% (High Exposure)`;
-
-        if (coverage >= 100) {
-          badgeClass = 'bg-success-subtle text-success border border-success-subtle';
-          text = `Coverage: ${coverage}% (Fully Secured)`;
-        } else if (coverage >= 50) {
-          badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
-          text = `Coverage: ${coverage}% (Partially Secured)`;
-        }
-
-        previewDiv.innerHTML = `<span class="live-ratio-badge ${badgeClass}">${text}</span>`;
-        previewDiv.classList.remove('d-none');
-      } else {
-        previewDiv.classList.add('d-none');
-      }
-    }
-
-    // 2. Sample Data Loader
-    function loadSample(type) {
-      const districtSelect = document.getElementById('district');
-      const locationSelect = document.getElementById('location_type');
-      const sectorSelect = document.getElementById('sector');
-
-      // Helper to safely select option
-      function setSelect(selectElem, value) {
-        if (!selectElem) return;
-        for (let i = 0; i < selectElem.options.length; i++) {
-          if (selectElem.options[i].value.toLowerCase().includes(value.toLowerCase())) {
-            selectElem.selectedIndex = i;
-            return;
-          }
-        }
-        if (selectElem.options.length > 1) selectElem.selectedIndex = 1;
-      }
-
-      if (type === 'prime') {
-        setSelect(districtSelect, 'Dhaka');
-        setSelect(locationSelect, 'Urban');
-        setSelect(sectorSelect, 'Retail');
-        document.getElementById('business_age_years').value = '10';
-        document.getElementById('owner_experience_years').value = '12';
-        document.getElementById('banking_years').value = '8';
-        document.getElementById('annual_revenue').value = '8500000';
-        document.getElementById('loan_amount').value = '2000000';
-        document.getElementById('debt_to_asset_ratio').value = '0.28';
-        document.getElementById('num_employees').value = '22';
-        document.getElementById('collateral_value').value = '3500000';
-        document.getElementById('past_defaults').value = '0';
-      } else if (type === 'moderate') {
-        setSelect(districtSelect, 'Chittagong');
-        setSelect(locationSelect, 'Urban');
-        setSelect(sectorSelect, 'Manufacturing');
-        document.getElementById('business_age_years').value = '4';
-        document.getElementById('owner_experience_years').value = '5';
-        document.getElementById('banking_years').value = '3';
-        document.getElementById('annual_revenue').value = '3200000';
-        document.getElementById('loan_amount').value = '1800000';
-        document.getElementById('debt_to_asset_ratio').value = '0.55';
-        document.getElementById('num_employees').value = '8';
-        document.getElementById('collateral_value').value = '1000000';
-        document.getElementById('past_defaults').value = '0';
-      } else if (type === 'subprime') {
-        setSelect(districtSelect, 'Sylhet');
-        setSelect(locationSelect, 'Semi-Urban');
-        setSelect(sectorSelect, 'Agriculture');
-        document.getElementById('business_age_years').value = '2';
-        document.getElementById('owner_experience_years').value = '1';
-        document.getElementById('banking_years').value = '1';
-        document.getElementById('annual_revenue').value = '1400000';
-        document.getElementById('loan_amount').value = '3000000';
-        document.getElementById('debt_to_asset_ratio').value = '0.88';
-        document.getElementById('num_employees').value = '3';
-        document.getElementById('collateral_value').value = '0';
-        document.getElementById('past_defaults').value = '2';
-      }
-
-      // Trigger visual formatting updates
-      updateLiveFormat('annual_revenue', 'revenueWords');
-      updateLiveFormat('loan_amount', 'loanWords');
-      updateLiveFormat('collateral_value', 'collateralWords');
-      updateLtvPreview();
-    }
-
-    // Clear form fields
-    function clearForm() {
-      const form = document.getElementById('riskForm');
-      form.reset();
-      const selects = form.querySelectorAll('select');
-      selects.forEach(s => s.selectedIndex = 0);
-      document.getElementById('revenueWords')?.classList.add('d-none');
-      document.getElementById('loanWords')?.classList.add('d-none');
-      document.getElementById('collateralWords')?.classList.add('d-none');
-      document.getElementById('ltvLivePreview')?.classList.add('d-none');
-    }
-
-    // Modal handler
-    let batchModalInstance = null;
-    function toggleBatchModal() {
-      if (!batchModalInstance) {
-        batchModalInstance = new bootstrap.Modal(document.getElementById('batchModal'));
-      }
-      batchModalInstance.show();
-    }
-
-    // Batch prediction AJAX
-    document.getElementById('batchUploadForm')?.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById('csvFileInput');
-      if (!fileInput.files.length) return;
-
-      const submitBtn = document.getElementById('batchSubmitBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Processing...';
-
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-
-      try {
-        const response = await fetch('/batch_predict', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await response.json();
-
-        if (response.ok && data.status === 'success') {
-          const tbody = document.getElementById('batchResultsTableBody');
-          tbody.innerHTML = '';
-          data.data.forEach(row => {
-            let badgeClass = row.predicted_risk === 'LOW' ? 'bg-success' : (row.predicted_risk === 'MEDIUM' ? 'bg-warning text-dark' : 'bg-danger');
-            tbody.innerHTML += `
-              <tr>
-                <td>${row.index}</td>
-                <td>${row.district}</td>
-                <td>${row.sector}</td>
-                <td>${Number(row.loan_amount).toLocaleString()}</td>
-                <td><span class="badge ${badgeClass}">${row.predicted_risk}</span></td>
-                <td>${row.risk_score}</td>
-              </tr>
-            `;
-          });
-          document.getElementById('batchResultsArea').classList.remove('d-none');
-        } else {
-          alert(data.error || 'Failed to process CSV file.');
-        }
-      } catch (err) {
-        alert('An error occurred during batch processing.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Run Batch Analysis';
-      }
-    });
-
-    // Initialize initial values formatting and print metadata
-    window.addEventListener('DOMContentLoaded', () => {
-      updateLiveFormat('annual_revenue', 'revenueWords');
-      updateLiveFormat('loan_amount', 'loanWords');
-      updateLiveFormat('collateral_value', 'collateralWords');
-      updateLtvPreview();
-
-      // Print metadata
-      const printDate = document.getElementById('printDate');
-      const printDocId = document.getElementById('printDocId');
-      if (printDate) printDate.textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      if (printDocId) printDocId.textContent = Math.floor(100000 + Math.random() * 900000);
-
-      // Auto scroll to result if present
-      const resultElem = document.getElementById('assessmentResult');
-      if (resultElem) {
-        resultElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  </script>
+  </div>
+</div>
 </body>
 </html>

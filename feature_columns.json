@@ -1,0 +1,14 @@
+[
+  "district",
+  "location_type",
+  "sector",
+  "business_age_years",
+  "owner_experience_years",
+  "banking_years",
+  "annual_revenue",
+  "loan_amount",
+  "debt_to_asset_ratio",
+  "num_employees",
+  "collateral_value",
+  "past_defaults"
+]
