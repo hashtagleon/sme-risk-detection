@@ -87,9 +87,22 @@ def predict():
         proba = model.predict_proba(X)[0]
         probabilities = dict(zip(model.classes_, proba.round(4)))
 
+        # Ensure consistent order: HIGH, MEDIUM, LOW
+        ordered_probs = {}
+        for k in ["HIGH", "MEDIUM", "LOW"]:
+            if k in probabilities:
+                ordered_probs[k] = float(probabilities[k])
+        for k, v in probabilities.items():
+            if k not in ordered_probs:
+                ordered_probs[k] = float(v)
+
+        max_prob = float(max(proba))
+        confidence = round(max_prob * 100, 1)
+
         result = {
             "risk_level": prediction,
-            "probabilities": {k: float(v) for k, v in probabilities.items()},
+            "confidence": confidence,
+            "probabilities": ordered_probs,
         }
 
         if request.is_json:

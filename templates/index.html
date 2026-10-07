@@ -1,236 +1,442 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SME Credit Risk Detection</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #14213D;
-    --ink-soft: #46527A;
-    --accent: #0E9C82;
-    --accent-hover: #0B7C68;
-    --low: #1E7B4D;
-    --medium: #B4700A;
-    --high: #C13B2E;
-    --glass-bg: rgba(255,255,255,0.42);
-    --glass-border: rgba(255,255,255,0.65);
-    --field-bg: rgba(255,255,255,0.45);
-    --field-border: rgba(20,33,61,0.14);
-  }
-  * { box-sizing: border-box; }
-  html, body { min-height: 100%; }
-  body {
-    font-family: 'Hind Siliguri', -apple-system, sans-serif;
-    color: var(--ink);
-    margin: 0;
-    padding: 32px 20px;
-    line-height: 1.4;
-    font-size: 14px;
-    background:
-      radial-gradient(circle at 12% 15%, rgba(94, 234, 212, 0.55) 0%, rgba(94, 234, 212, 0) 45%),
-      radial-gradient(circle at 88% 20%, rgba(129, 140, 248, 0.45) 0%, rgba(129, 140, 248, 0) 45%),
-      radial-gradient(circle at 20% 90%, rgba(56, 189, 248, 0.4) 0%, rgba(56, 189, 248, 0) 50%),
-      radial-gradient(circle at 90% 85%, rgba(52, 211, 153, 0.4) 0%, rgba(52, 211, 153, 0) 50%),
-      linear-gradient(160deg, #E9F4F2 0%, #E4EBF9 50%, #EAF2F0 100%);
-    background-attachment: fixed;
-  }
-  .page { max-width: 660px; margin: 0 auto; }
-  .masthead { margin-bottom: 22px; text-align: center; }
-  .masthead .eyebrow { font-size: 12px; color: var(--accent-hover); font-weight: 600; letter-spacing: 0.03em; margin: 0 0 6px; }
-  .masthead h1 { font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
-  .masthead p { font-size: 13px; color: var(--ink-soft); margin: 0 auto; max-width: 48ch; }
-  .card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 26px 28px 28px;
-    backdrop-filter: blur(22px) saturate(160%);
-    -webkit-backdrop-filter: blur(22px) saturate(160%);
-    box-shadow: 0 1px 1px rgba(255,255,255,0.6) inset, 0 12px 40px rgba(20,33,61,0.10);
-  }
-  .error {
-    background: rgba(193,59,46,0.14);
-    border-left: 3px solid var(--high);
-    color: #8C2A20;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    margin-bottom: 18px;
-  }
-  .result {
-    border-radius: 14px;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255,255,255,0.5);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    backdrop-filter: blur(10px);
-  }
-  .result.LOW { background: rgba(30,123,77,0.14); }
-  .result.MEDIUM { background: rgba(180,112,10,0.14); }
-  .result.HIGH { background: rgba(193,59,46,0.14); }
-  .result-main { min-width: 110px; }
-  .result-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); margin: 0; }
-  .result-level { font-size: 21px; font-weight: 700; margin: 2px 0 0; }
-  .result.LOW .result-level { color: var(--low); }
-  .result.MEDIUM .result-level { color: var(--medium); }
-  .result.HIGH .result-level { color: var(--high); }
-  .result-probs { flex: 1; min-width: 180px; }
-  .prob-row { display: grid; grid-template-columns: 56px 1fr 44px; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 12px; }
-  .prob-row:last-child { margin-bottom: 0; }
-  .prob-track { background: rgba(20,33,61,0.10); border-radius: 5px; height: 5px; overflow: hidden; }
-  .prob-fill { height: 100%; border-radius: 5px; background: currentColor; }
-  .prob-row.LOW { color: var(--low); }
-  .prob-row.MEDIUM { color: var(--medium); }
-  .prob-row.HIGH { color: var(--high); }
-  .prob-pct { text-align: right; color: var(--ink-soft); }
-  form { margin: 0; }
-  .section-title { font-size: 11px; font-weight: 600; color: var(--accent-hover); margin: 20px 0 10px; letter-spacing: 0.02em; }
-  .section-title:first-of-type { margin-top: 0; }
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 14px; }
-  .field label { display: block; font-size: 11.5px; margin-bottom: 4px; }
-  .field label .en { color: var(--ink); font-weight: 500; }
-  .field label .bn { color: var(--ink-soft); font-weight: 400; }
-  .field input, .field select {
-    width: 100%; padding: 7px 9px; border: 1px solid var(--field-border); border-radius: 8px;
-    font-size: 13px; font-family: inherit; color: var(--ink); background: var(--field-bg);
-    backdrop-filter: blur(6px); transition: border-color 0.15s ease, background 0.15s ease;
-  }
-  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.75); }
-  .submit-row { display: flex; justify-content: flex-end; margin-top: 22px; }
-  button {
-    background: var(--accent); color: #fff; border: none; padding: 10px 22px; border-radius: 10px;
-    font-size: 13.5px; font-weight: 600; font-family: inherit; cursor: pointer;
-    box-shadow: 0 6px 18px rgba(14,156,130,0.35); transition: background 0.15s ease, box-shadow 0.15s ease;
-  }
-  button:hover { background: var(--accent-hover); box-shadow: 0 6px 20px rgba(11,124,104,0.4); }
-  @media (max-width: 620px) { .grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 420px) {
-    .grid { grid-template-columns: 1fr; }
-    .card { padding: 20px; }
-    .submit-row { justify-content: stretch; }
-    button { width: 100%; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SME Credit Risk Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #14213D;
+      --ink-soft: #46527A;
+      --accent: #0E9C82;
+      --accent-hover: #0B7C68;
+      --low: #1E7B4D;
+      --medium: #B4700A;
+      --high: #C13B2E;
+      --glass-bg: rgba(255, 255, 255, 0.42);
+      --glass-border: rgba(255, 255, 255, 0.65);
+      --field-bg: rgba(255, 255, 255, 0.45);
+      --field-border: rgba(20, 33, 61, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Hind Siliguri', -apple-system, sans-serif;
+      color: var(--ink);
+      margin: 0;
+      padding: 32px 20px;
+      line-height: 1.4;
+      font-size: 14px;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(94, 234, 212, 0.55) 0%, rgba(94, 234, 212, 0) 45%),
+        radial-gradient(circle at 88% 20%, rgba(129, 140, 248, 0.45) 0%, rgba(129, 140, 248, 0) 45%),
+        radial-gradient(circle at 20% 90%, rgba(56, 189, 248, 0.4) 0%, rgba(56, 189, 248, 0) 50%),
+        radial-gradient(circle at 90% 85%, rgba(52, 211, 153, 0.4) 0%, rgba(52, 211, 153, 0) 50%),
+        linear-gradient(160deg, #E9F4F2 0%, #E4EBF9 50%, #EAF2F0 100%);
+      background-attachment: fixed;
+    }
+
+    .page {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    .masthead {
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .masthead .eyebrow {
+      font-size: 12px;
+      color: var(--accent-hover);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin: 0 0 6px;
+    }
+
+    .masthead h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .masthead p {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin: 0 auto;
+      max-width: 48ch;
+    }
+
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 26px 28px 28px;
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow: 0 1px 1px rgba(255, 255, 255, 0.6) inset, 0 12px 40px rgba(20, 33, 61, 0.10);
+    }
+
+    .error {
+      background: rgba(193, 59, 46, 0.14);
+      border-left: 3px solid var(--high);
+      color: #8C2A20;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .result {
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .result.LOW {
+      background: rgba(30, 123, 77, 0.14);
+    }
+
+    .result.MEDIUM {
+      background: rgba(180, 112, 10, 0.14);
+    }
+
+    .result.HIGH {
+      background: rgba(193, 59, 46, 0.14);
+    }
+
+    .result-main {
+      min-width: 110px;
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .result-level {
+      font-size: 21px;
+      font-weight: 700;
+      margin: 2px 0 0;
+    }
+
+    .result.LOW .result-level {
+      color: var(--low);
+    }
+
+    .result.MEDIUM .result-level {
+      color: var(--medium);
+    }
+
+    .result.HIGH .result-level {
+      color: var(--high);
+    }
+
+    .result-probs {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .prob-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 44px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .prob-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .prob-track {
+      background: rgba(20, 33, 61, 0.10);
+      border-radius: 5px;
+      height: 5px;
+      overflow: hidden;
+    }
+
+    .prob-fill {
+      height: 100%;
+      border-radius: 5px;
+      background: currentColor;
+    }
+
+    .prob-row.LOW {
+      color: var(--low);
+    }
+
+    .prob-row.MEDIUM {
+      color: var(--medium);
+    }
+
+    .prob-row.HIGH {
+      color: var(--high);
+    }
+
+    .prob-pct {
+      text-align: right;
+      color: var(--ink-soft);
+    }
+
+    form {
+      margin: 0;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-hover);
+      margin: 20px 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .section-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11.5px;
+      margin-bottom: 4px;
+    }
+
+    .field label .en {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .field label .bn {
+      color: var(--ink-soft);
+      font-weight: 400;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 7px 9px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--ink);
+      background: var(--field-bg);
+      backdrop-filter: blur(6px);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 22px;
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(14, 156, 130, 0.35);
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px rgba(11, 124, 104, 0.4);
+    }
+
+    @media (max-width: 620px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .submit-row {
+        justify-content: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="page">
+  <div class="page">
 
-  <div class="masthead">
-    <p class="eyebrow">ক্রেডিট রিস্ক অ্যাসেসমেন্ট সিস্টেম</p>
-    <h1>SME Credit Risk Detection</h1>
-    <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর নির্ধারণের জন্য একটি বিশ্লেষণধর্মী টুল।</p>
-  </div>
-
-  <div class="card">
-
-    {% if error %}
-    <div class="error">{{ error }}</div>
-    {% endif %}
-
-    {% if result %}
-    <div class="result {{ result.risk_level }}">
-      <div class="result-main">
-        <p class="result-label">পূর্বাভাসকৃত ঝুঁকি</p>
-        <p class="result-level">{{ result.risk_level }}</p>
-      </div>
-      <div class="result-probs">
-        {% for level, prob in result.probabilities.items() %}
-        <div class="prob-row {{ level }}">
-          <span>{{ level }}</span>
-          <div class="prob-track"><div class="prob-fill" style="width: {{ (prob*100)|round(1) }}%;"></div></div>
-          <span class="prob-pct">{{ (prob*100)|round(1) }}%</span>
-        </div>
-        {% endfor %}
-      </div>
+    <div class="masthead">
+      <p class="eyebrow">ক্রেডিট রিস্ক অ্যাসেসমেন্ট সিস্টেম</p>
+      <h1>SME Credit Risk Detection</h1>
+      <p>ছোট ও মাঝারি উদ্যোক্তাদের ঋণ আবেদনের ঝুঁকি স্তর নির্ধারণের জন্য একটি বিশ্লেষণধর্মী টুল।</p>
     </div>
-    {% endif %}
 
-    <form method="POST" action="/predict">
+    <div class="card">
 
-      <p class="section-title">অবস্থান ও খাত</p>
-      <div class="grid">
-        <div class="field">
-          <label><span class="en">District</span> <span class="bn">— জেলা</span></label>
-          <select name="district" required>
-            {% for d in districts %}
-            <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-          </select>
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+
+      {% if result %}
+      <div class="result {{ result.risk_level }}">
+        <div class="result-main">
+          <p class="result-label">পূর্বাভাসকৃত ঝুঁকি</p>
+          <p class="result-level">{{ result.risk_level }}</p>
         </div>
-        <div class="field">
-          <label><span class="en">Location</span> <span class="bn">— অবস্থানের ধরন</span></label>
-          <select name="location_type" required>
-            {% for lt in location_types %}
-            <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="field">
-          <label><span class="en">Sector</span> <span class="bn">— ব্যবসার খাত</span></label>
-          <select name="sector" required>
-            {% for s in sectors %}
-            <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
-            {% endfor %}
-          </select>
+        <div class="result-probs">
+          {% for level, prob in result.probabilities.items() %}
+          <div class="prob-row {{ level }}">
+            <span>{{ level }}</span>
+            <div class="prob-track">
+              <div class="prob-fill" style="width: {{ (prob*100)|round(1) }}%;"></div>
+            </div>
+            <span class="prob-pct">{{ (prob*100)|round(1) }}%</span>
+          </div>
+          {% endfor %}
         </div>
       </div>
+      {% endif %}
 
-      <p class="section-title">ব্যবসার প্রোফাইল</p>
-      <div class="grid">
-        <div class="field">
-          <label><span class="en">Business Age</span> <span class="bn">— বয়স (বছর)</span></label>
-          <input type="number" step="1" name="business_age_years" required value="{{ form_data.business_age_years if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Owner Experience</span> <span class="bn">— অভিজ্ঞতা (বছর)</span></label>
-          <input type="number" step="1" name="owner_experience_years" required value="{{ form_data.owner_experience_years if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Banking Years</span> <span class="bn">— ব্যাংকিং সম্পর্ক</span></label>
-          <input type="number" step="1" name="banking_years" required value="{{ form_data.banking_years if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Employees</span> <span class="bn">— কর্মচারী সংখ্যা</span></label>
-          <input type="number" step="1" name="num_employees" required value="{{ form_data.num_employees if form_data else '' }}">
-        </div>
-      </div>
+      <form method="POST" action="/predict">
 
-      <p class="section-title">আর্থিক তথ্য</p>
-      <div class="grid">
-        <div class="field">
-          <label><span class="en">Annual Revenue</span> <span class="bn">— বার্ষিক আয়</span></label>
-          <input type="number" step="any" name="annual_revenue" required value="{{ form_data.annual_revenue if form_data else '' }}">
+        <p class="section-title">অবস্থান ও খাত</p>
+        <div class="grid">
+          <div class="field">
+            <label><span class="en">District</span> <span class="bn">— জেলা</span></label>
+            <select name="district" required>
+              {% for d in districts %}
+              <option value="{{ d }}" {% if form_data and form_data.district==d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="en">Location</span> <span class="bn">— অবস্থানের ধরন</span></label>
+            <select name="location_type" required>
+              {% for lt in location_types %}
+              <option value="{{ lt }}" {% if form_data and form_data.location_type==lt %}selected{% endif %}>{{ lt }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="en">Sector</span> <span class="bn">— ব্যবসার খাত</span></label>
+            <select name="sector" required>
+              {% for s in sectors %}
+              <option value="{{ s }}" {% if form_data and form_data.sector==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-        <div class="field">
-          <label><span class="en">Loan Amount</span> <span class="bn">— ঋণের পরিমাণ</span></label>
-          <input type="number" step="any" name="loan_amount" required value="{{ form_data.loan_amount if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Debt/Asset Ratio</span> <span class="bn">— ঋণ-সম্পদ অনুপাত</span></label>
-          <input type="number" step="any" name="debt_to_asset_ratio" required value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Collateral Value</span> <span class="bn">— জামানত (না থাকলে ০)</span></label>
-          <input type="number" step="any" name="collateral_value" required value="{{ form_data.collateral_value if form_data else '' }}">
-        </div>
-        <div class="field">
-          <label><span class="en">Past Defaults</span> <span class="bn">— ঋণখেলাপি (সংখ্যা)</span></label>
-          <input type="number" step="1" name="past_defaults" required value="{{ form_data.past_defaults if form_data else '0' }}">
-        </div>
-      </div>
 
-      <div class="submit-row">
-        <button type="submit">ঝুঁকি পূর্বাভাস দাও</button>
-      </div>
-    </form>
+        <p class="section-title">ব্যবসার প্রোফাইল</p>
+        <div class="grid">
+          <div class="field">
+            <label><span class="en">Business Age</span> <span class="bn">— বয়স (বছর)</span></label>
+            <input type="number" step="1" name="business_age_years" required
+              value="{{ form_data.business_age_years if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Owner Experience</span> <span class="bn">— অভিজ্ঞতা (বছর)</span></label>
+            <input type="number" step="1" name="owner_experience_years" required
+              value="{{ form_data.owner_experience_years if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Banking Years</span> <span class="bn">— ব্যাংকিং সম্পর্ক</span></label>
+            <input type="number" step="1" name="banking_years" required
+              value="{{ form_data.banking_years if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Employees</span> <span class="bn">— কর্মচারী সংখ্যা</span></label>
+            <input type="number" step="1" name="num_employees" required
+              value="{{ form_data.num_employees if form_data else '' }}">
+          </div>
+        </div>
+
+        <p class="section-title">আর্থিক তথ্য</p>
+        <div class="grid">
+          <div class="field">
+            <label><span class="en">Annual Revenue</span> <span class="bn">— বার্ষিক আয়</span></label>
+            <input type="number" step="any" name="annual_revenue" required
+              value="{{ form_data.annual_revenue if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Loan Amount</span> <span class="bn">— ঋণের পরিমাণ</span></label>
+            <input type="number" step="any" name="loan_amount" required
+              value="{{ form_data.loan_amount if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Debt/Asset Ratio</span> <span class="bn">— ঋণ-সম্পদ অনুপাত</span></label>
+            <input type="number" step="any" name="debt_to_asset_ratio" required
+              value="{{ form_data.debt_to_asset_ratio if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Collateral Value</span> <span class="bn">— জামানত (না থাকলে ০)</span></label>
+            <input type="number" step="any" name="collateral_value" required
+              value="{{ form_data.collateral_value if form_data else '' }}">
+          </div>
+          <div class="field">
+            <label><span class="en">Past Defaults</span> <span class="bn">— ঋণখেলাপি (সংখ্যা)</span></label>
+            <input type="number" step="1" name="past_defaults" required
+              value="{{ form_data.past_defaults if form_data else '0' }}">
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit">ঝুঁকি পূর্বাভাস দাও</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 </body>
+
 </html>
