@@ -1285,6 +1285,24 @@
           <span class="step-pill" data-i18n="step_badge">Step 1 of 2 &bull; Input</span>
         </div>
 
+        <!-- Quick Demo Presets Bar -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 13px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px;">
+            <span>⚡</span> <span data-i18n="demo_presets_title">Quick Fill Demo Profiles:</span>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('low')" style="border-color: #86efac; background: #f0fdf4; color: #166534; font-weight: 600;">
+              🟢 Low Risk Demo
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('medium')" style="border-color: #fde047; background: #fefce8; color: #854d0e; font-weight: 600;">
+              🟡 Medium Risk Demo
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('high')" style="border-color: #fca5a5; background: #fef2f2; color: #991b1b; font-weight: 600;">
+              🔴 High Risk Demo
+            </button>
+          </div>
+        </div>
+
         <form method="POST" action="/predict" id="riskForm">
 
           <!-- 1. Business Profile -->
@@ -2020,6 +2038,73 @@
       if (!confirm("Are you sure you want to clear the evaluation audit history?")) return;
       fetch("/api/clear-history", { method: "POST" })
         .then(() => loadAnalyticsData());
+    }
+
+    // --- QUICK FILL DEMO PROFILES ---
+    const demoProfiles = {
+      low: {
+        district: "Dhaka",
+        location_type: "urban",
+        sector: "manufacturing",
+        business_age_years: 8,
+        owner_experience_years: 12,
+        banking_years: 6,
+        annual_revenue: 9500000,
+        loan_amount: 2000000,
+        debt_to_asset_ratio: 0.35,
+        num_employees: 25,
+        collateral_value: 3500000,
+        past_defaults: 0
+      },
+      medium: {
+        district: "Chattogram",
+        location_type: "semi_urban",
+        sector: "textiles",
+        business_age_years: 4,
+        owner_experience_years: 5,
+        banking_years: 3,
+        annual_revenue: 4500000,
+        loan_amount: 1800000,
+        debt_to_asset_ratio: 0.68,
+        num_employees: 10,
+        collateral_value: 1200000,
+        past_defaults: 0
+      },
+      high: {
+        district: "Barishal",
+        location_type: "rural",
+        sector: "agriculture",
+        business_age_years: 2,
+        owner_experience_years: 1,
+        banking_years: 1,
+        annual_revenue: 1400000,
+        loan_amount: 3000000,
+        debt_to_asset_ratio: 0.88,
+        num_employees: 3,
+        collateral_value: 0,
+        past_defaults: 2
+      }
+    };
+
+    function fillDemo(type) {
+      const p = demoProfiles[type];
+      if (!p) return;
+
+      document.getElementById("district").value = p.district;
+      document.getElementById("location_type").value = p.location_type;
+      document.getElementById("sector").value = p.sector;
+      document.getElementById("business_age_years").value = p.business_age_years;
+      document.getElementById("owner_experience_years").value = p.owner_experience_years;
+      document.getElementById("banking_years").value = p.banking_years;
+      document.getElementById("annual_revenue").value = p.annual_revenue;
+      document.getElementById("loan_amount").value = p.loan_amount;
+      document.getElementById("debt_to_asset_ratio").value = p.debt_to_asset_ratio;
+      document.getElementById("num_employees").value = p.num_employees;
+      document.getElementById("collateral_value").value = p.collateral_value;
+      document.getElementById("past_defaults").value = p.past_defaults;
+
+      // Smooth scroll to submit button
+      document.querySelector(".actions-row").scrollIntoView({ behavior: "smooth" });
     }
 
     // Initialize Language on page load
